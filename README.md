@@ -67,7 +67,5 @@ powershell -ExecutionPolicy Bypass -File .\mbcc-console-theme\install.ps1
 - 如需二次分发或商用，请自行替换徽标与字体，并取得相应授权。
 
 ## 支持作者给大肥鱼买大米
-<img width="1206" height="1206" alt="mm_reward_qrcode_1792812912284" src="https://github.com/user-attachments/assets/8b4295f1-a2c9-4b51-8ac2-e84b7217b2ef" />
-<img width="1182" height="1772" alt="1792813051762 jpg" src="https://github.com/user-attachments/assets/4bc8c00d-62f2-489f-968d-48ad3fd40777" />
 
 
