@@ -1,6 +1,6 @@
 {
   "name": "dsh-theme-mbcc-console",
-  "version": "0.48.0",
+  "version": "0.50.0",
   "private": true,
   "description": "MBCC console theme for DSH: near-black terminal, paper dossier light mode, crimson signal accents, zero radius.",
   "license": "MIT",

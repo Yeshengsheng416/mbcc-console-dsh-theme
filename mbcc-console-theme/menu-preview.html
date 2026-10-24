@@ -95,6 +95,100 @@ body[data-mbcc-grid='off'] [class*='_centerCol'] [data-phase='active'] {
 }
 body[data-mbcc-pill='off'] #mbcc-balance { display: none !important; }
 
+/* ============================================================
+   发送/入场动效
+   ============================================================ */
+#mbcc-sweep {
+  position: fixed;
+  height: 1px;
+  pointer-events: none;
+  z-index: 2147483140;
+  opacity: 0;
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--dsw-alias-brand-primary), transparent 85%);
+}
+#mbcc-sweep.is-on { animation: mbcc-sweep 280ms cubic-bezier(0.22, 1, 0.36, 1) 1; }
+@keyframes mbcc-sweep {
+  0% { opacity: 0; transform: scaleX(0); }
+  18% { opacity: 1; }
+  72% { opacity: 0.75; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+
+/* 新消息：轻微上浮 + 左侧红规自上而下画出 */
+body[data-mbcc-console='on'] [data-chat-flow-key].mbcc-enter {
+  animation: mbcc-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+  position: relative;
+}
+body[data-mbcc-console='on'] [data-chat-flow-key].mbcc-enter::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--dsw-alias-brand-primary);
+  transform-origin: top center;
+  animation: mbcc-rule-grow 280ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+@keyframes mbcc-enter {
+  from { opacity: 0.55; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes mbcc-rule-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+/* 会话选中：2px 红规生长（替换原来的 inset 阴影） */
+body[data-mbcc-console='on'] [data-row-key^='session:'][aria-selected='true']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--dsw-alias-brand-primary);
+  transform-origin: top center;
+  animation: mbcc-rule-grow 220ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+
+/* 窗口失焦：待机 */
+#mbcc-idle {
+  position: fixed;
+  left: 14px;
+  bottom: 12px;
+  z-index: 2147483040;
+  display: none;
+  font: 9px/1 "Consolas", "JetBrains Mono", monospace;
+  letter-spacing: 0.22em;
+  color: #5f6b76;
+  pointer-events: none;
+  user-select: none;
+}
+#mbcc-idle::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 7px;
+  background: #5f6b76;
+  animation: mbcc-idle-blink 2.6s steps(1, end) infinite;
+}
+@keyframes mbcc-idle-blink {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0.25; }
+}
+body[data-mbcc-idle='on'] #mbcc-idle { display: block; }
+body[data-mbcc-idle='on'] [class*='_sidebarCol'] button[class*='_brand'] { opacity: 0.55; }
+body[data-mbcc-idle='on'] [class*='_sidebarCol'] button[class*='_brand']::after { color: #6b747e; }
+
+/* 彩蛋：乱码行的轻微噪点 */
+#mbcc-boot .boot-garble {
+  opacity: 0.92;
+  text-shadow: 0 0 6px rgba(224, 75, 58, 0.25);
+}
+
 /* 切换主题/强调色时的柔光过渡层 */
 #mbcc-fade {
   position: fixed;
@@ -179,6 +273,7 @@ body[data-mbcc-pill='off'] #mbcc-balance { display: none !important; }
     <button class="m-row" data-toggle="grid"><span>对话区底纹</span><i class="m-switch" aria-pressed="true"></i></button>
     <button class="m-row" data-toggle="pill"><span>余额胶囊</span><i class="m-switch" aria-pressed="false"></i></button>
     <button class="m-row" data-toggle="fx"><span>故障动效</span><i class="m-switch" aria-pressed="true"></i></button>
+    <button class="m-row" data-toggle="sfx"><span>界面音效</span><i class="m-switch" aria-pressed="false"></i></button>
     <button class="m-row" data-toggle="roundFont"><span>圆体界面</span><i class="m-switch" aria-pressed="false"></i></button>
     <div class="m-row m-col"><span>强调色</span><span class="m-swatches">
       <button class="m-swatch is-on" data-accent="red" style="--c:#A32A22"></button>

@@ -4,7 +4,8 @@ const path = require('path');
 
 const src = fs.readFileSync(path.join(__dirname, 'client.js'), 'utf8').split('\r\n').join('\n');
 const start = src.indexOf('/* ============================================================\n   主题设置');
-const next = src.indexOf('\n/* ============================================================', start + 10);
+const sig = src.indexOf('\n/* ============================================================\n   故障信号层');
+const next = sig > start ? sig : src.indexOf('\n/* ============================================================', start + 10);
 let css = src.slice(start, next);
 
 const page = `<!DOCTYPE html>
@@ -21,6 +22,7 @@ ${css}
     <button class="m-row" data-toggle="grid"><span>对话区底纹</span><i class="m-switch" aria-pressed="true"></i></button>
     <button class="m-row" data-toggle="pill"><span>余额胶囊</span><i class="m-switch" aria-pressed="false"></i></button>
     <button class="m-row" data-toggle="fx"><span>故障动效</span><i class="m-switch" aria-pressed="true"></i></button>
+    <button class="m-row" data-toggle="sfx"><span>界面音效</span><i class="m-switch" aria-pressed="false"></i></button>
     <button class="m-row" data-toggle="roundFont"><span>圆体界面</span><i class="m-switch" aria-pressed="false"></i></button>
     <div class="m-row m-col"><span>强调色</span><span class="m-swatches">
       <button class="m-swatch is-on" data-accent="red" style="--c:#A32A22"></button>
