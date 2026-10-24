@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8" /><style>
+html, body { margin: 0; height: 100%; }
+body {
+  background: #050508; color: #e8e0d4; padding: 40px 24px;
+  font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+  --dsw-alias-label-primary: #e8e0d4;
+  --dsw-alias-label-secondary: #a9bccb;
+  --dsw-alias-border-l1: #ffffff12;
+  --dsw-alias-border-l2: #ffffff1f;
+  --dsw-alias-border-l3: #ffffff29;
+  --dsw-alias-brand-primary: #a32a22;
+  --dsw-alias-business-primary: #e04b3a;
+}
+.col { width: 260px; }
+.row { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 8px; font-size: 13px; }
+/* ============================================================
+   左栏：档案索引风格
+   行 = 一条档案记录：去圆角、发丝分隔线、选中态暗红底 + 2px 红规。
+   钩子用 data-row-key（应用自己打的稳定属性），不猜哈希类名。
+   ============================================================ */
+body[data-mbcc-console='on'] [data-row-key^='session:'],
+body[data-mbcc-console='on'] [data-row-key^='workspace:'] {
+  border-radius: 0 !important;
+  position: relative;
+}
+
+/* 线画在行的上沿：分组标题与下一条会话之间只会有一条线，不会叠成双线 */
+body[data-mbcc-console='on'] [data-row-key^='session:'] {
+  border-top: 1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 60%, transparent);
+  border-bottom: 0 !important;
+}
+
+body[data-mbcc-console='on'] [data-row-key^='session:']:hover {
+  background: color-mix(in srgb, var(--dsw-alias-brand-primary) 9%, transparent) !important;
+}
+
+/* 选中：从暗红到透明的横向渐变 + 左侧 2px 红规，模仿档案列表的"当前条目" */
+body[data-mbcc-console='on'] [data-row-key^='session:'][aria-selected='true'] {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--dsw-alias-brand-primary) 34%, transparent) 0%,
+    color-mix(in srgb, var(--dsw-alias-brand-primary) 10%, transparent) 100%
+  ) !important;
+  box-shadow:
+    inset 2px 0 0 var(--dsw-alias-brand-primary),
+    inset 0 0 0 1px color-mix(in srgb, var(--dsw-alias-brand-primary) 22%, transparent);
+}
+
+/* 行内文字：收紧一档，做出"索引条目"的密度 */
+body[data-mbcc-console='on'] [data-row-key^='session:'] [class*='_title'] {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+/* 工作区分组图标：切角档案夹 + 红方角标 */
+body[data-mbcc-console='on'] [data-row-key^='workspace:'] [class*='_folder'] {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+body[data-mbcc-console='on'] [data-row-key^='workspace:'] [class*='_folder'] svg {
+  display: none !important;
+}
+body[data-mbcc-console='on'] [data-row-key^='workspace:'] [class*='_folder']::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><g fill='none' stroke='white' stroke-width='1.5' stroke-linejoin='miter'><path d='M2 5.5H7.5L9.5 7.5H15.5L17.5 9.5V16.5H2Z'/><path d='M2 10.2H17.5'/></g></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><g fill='none' stroke='white' stroke-width='1.5' stroke-linejoin='miter'><path d='M2 5.5H7.5L9.5 7.5H15.5L17.5 9.5V16.5H2Z'/><path d='M2 10.2H17.5'/></g></svg>") center / contain no-repeat;
+}
+body[data-mbcc-console='on'] [data-row-key^='workspace:'] [class*='_folder']::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  right: -2px;
+  width: 5px;
+  height: 5px;
+  background: var(--dsw-alias-brand-primary);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* 工作区分组行：只有一条 2px 粗线，和上方内容留出间距 */
+body[data-mbcc-console='on'] [data-row-key^='workspace:'] {
+  border-top: 2px solid color-mix(in srgb, var(--dsw-alias-brand-primary) 26%, var(--dsw-alias-border-l3));
+  border-bottom: 0 !important;
+  margin-top: 12px;
+  border-radius: 0 !important;
+  position: relative;
+}
+body[data-mbcc-console='on'] [data-row-key^='workspace:'] [class*='_title'] {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--dsw-alias-label-secondary);
+}
+
+
+</style></head>
+<body data-mbcc-console="on" data-ds-dark-theme>
+  <div class="col">
+    <div class="row" data-row-key="workspace:mbcc">
+      <span class="Hqq-bq_folder"></span><span class="Hqq-bq_title">MBCCControl</span>
+    </div>
+    <div class="row" data-row-key="session:a"><span class="Hqq-bq_title">无期迷途美术风格复刻研究</span></div>
+    <div class="row" data-row-key="session:b"><span class="Hqq-bq_title">项目解析与说明文档</span></div>
+    <div class="row" data-row-key="workspace:default">
+      <span class="Hqq-bq_folder"></span><span class="Hqq-bq_title">默认工作区</span>
+    </div>
+    <div class="row" data-row-key="session:c"><span class="Hqq-bq_title">DSH主题编写研究</span></div>
+  </div>
+</body></html>

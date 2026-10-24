@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MBCC Console — DSH 主题预览</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background:
+      radial-gradient(70% 50% at 50% 0%, #14141c 0%, #07070b 55%, #050507 100%);
+    color: #e8e0d4;
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    padding: 36px 20px 72px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .head { max-width: 620px; margin: 0 auto 28px; }
+  .kicker {
+    font-family: "Consolas", "JetBrains Mono", monospace;
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    color: #a9bccb; margin-bottom: 10px;
+  }
+  h1 {
+    font-family: "Songti SC", "SimSun", "Noto Serif SC", serif;
+    font-weight: 900; font-size: 34px; line-height: 1.1; letter-spacing: .04em;
+    margin: 0 0 10px;
+  }
+  .sub { color: #7f93a6; font-size: 13px; line-height: 1.8; margin: 0; }
+  .sub b { color: #e8e0d4; font-weight: 500; }
+
+  .stack { max-width: 620px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
+
+  .cap {
+    display: flex; align-items: baseline; gap: 12px;
+    font-family: "Consolas", monospace; font-size: 10px; letter-spacing: .18em;
+    text-transform: uppercase; color: #6b7885; margin-bottom: 8px;
+  }
+  .cap b { color: #e04b3a; font-weight: 600; }
+
+  /* ---------- 窗口 ---------- */
+  .win {
+    position: relative;
+    display: grid;
+    grid-template-columns: 154px 1fr;
+    height: 560px;
+    background: var(--dsw-alias-bg-base);
+    border: 1px solid var(--dsw-alias-border-l2);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+    overflow: hidden;
+    color: var(--dsw-alias-label-primary);
+  }
+
+  /* 侧栏 */
+  .side {
+    position: relative;
+    background: var(--dsw-specific-sidebar-fill);
+    background-image: repeating-linear-gradient(0deg, rgba(232,224,212,.012) 0 1px, transparent 1px 3px);
+    border-right: 1px solid color-mix(in srgb, var(--dsw-alias-brand-primary) 42%, var(--dsw-alias-border-l3));
+    box-shadow: 14px 0 30px -16px rgba(0,0,0,.7), inset -1px 0 0 rgba(0,0,0,.38);
+    padding: 14px 10px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .side::after {
+    content: ''; position: absolute; top: 0; right: -1px; bottom: 0; width: 1px;
+    pointer-events: none; opacity: .8;
+    background: repeating-linear-gradient(to bottom,
+      color-mix(in srgb, var(--dsw-alias-brand-primary) 78%, transparent) 0 8px,
+      transparent 8px 26px);
+  }
+  .brand { display: flex; align-items: center; gap: 9px; padding: 2px 6px 14px; }
+  .mark {
+    width: 18px; height: 18px; border: 1px solid var(--dsw-alias-brand-primary);
+    transform: rotate(45deg); display: grid; place-items: center; flex: none;
+  }
+  .mark span {
+    transform: rotate(-45deg); font: 9px/1 "Consolas", monospace;
+    color: var(--dsw-alias-brand-primary);
+  }
+  .brand b {
+    font-family: "Consolas", monospace; font-size: 10px;
+    letter-spacing: .16em; color: var(--dsw-alias-label-secondary);
+    font-weight: 600;
+  }
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 30px; padding: 0 8px; font-size: 12px;
+    color: var(--dsw-alias-label-secondary);
+    border-left: 2px solid transparent;
+  }
+  .nav.active {
+    background: var(--dsw-specific-sidebar-nav-item-active);
+    border-left-color: var(--dsw-alias-brand-primary);
+    color: var(--dsw-alias-label-primary);
+  }
+  .nav .k { font-family: "Consolas", monospace; font-size: 9px; color: var(--dsw-alias-label-caption); }
+  .side-sep {
+    margin: 12px 6px 8px; font: 9px/1 "Consolas", monospace;
+    letter-spacing: .18em; color: var(--dsw-alias-label-caption);
+  }
+  .sess {
+    font-size: 12px; color: var(--dsw-alias-label-secondary);
+    padding: 7px 8px 7px 10px; line-height: 1.4;
+    border-bottom: 1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 72%, transparent);
+    position: relative;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sess.on {
+    background: linear-gradient(90deg,
+      color-mix(in srgb, var(--dsw-alias-brand-primary) 34%, transparent) 0%,
+      color-mix(in srgb, var(--dsw-alias-brand-primary) 10%, transparent) 100%);
+    box-shadow: inset 2px 0 0 var(--dsw-alias-brand-primary), inset 0 0 0 1px color-mix(in srgb, var(--dsw-alias-brand-primary) 22%, transparent);
+    color: var(--dsw-alias-label-primary);
+  }
+
+  /* 新会话按钮：警戒线暗纹 */
+  .new-session {
+    position: relative;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    height: 38px; margin: 0 2px 12px;
+    border: 1px solid var(--dsw-alias-border-l3);
+    background-color: var(--dsw-alias-button-elevated-fill);
+    background-image: repeating-linear-gradient(-45deg,
+      color-mix(in srgb, var(--dsw-alias-brand-primary) 11%, transparent) 0 7px,
+      transparent 7px 20px);
+    box-shadow: inset 2px 0 0 color-mix(in srgb, var(--dsw-alias-brand-primary) 72%, transparent);
+    color: var(--dsw-alias-label-primary);
+    font-size: 14px; font-weight: 500; letter-spacing: .08em;
+  }
+  .new-session .plus { font-family: "Consolas", monospace; font-size: 14px; color: var(--dsw-alias-label-secondary); }
+
+  /* 主区 */
+  .main {
+    display: flex; flex-direction: column; min-width: 0;
+    position: relative;
+    background-repeat: repeat;
+    background-size: 440px 440px;
+  }
+  #win-light .main {
+    background-image:
+      linear-gradient(to top, var(--dsw-alias-bg-base) 0 22%, transparent 36%),
+      url("assets/emblem-wm-light.webp"),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='380' height='24'><text x='190' y='17' text-anchor='middle' font-family='Georgia,serif' font-size='13' letter-spacing='2.6' fill='rgba(32,24,18,0.42)'>MINOS BUREAU OF CRISIS CONTROL</text></svg>"),
+      linear-gradient(rgba(32, 24, 18, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(32, 24, 18, 0.05) 1px, transparent 1px),
+      repeating-linear-gradient(0deg, rgba(32, 24, 18, 0.014) 0 1px, transparent 1px 4px),
+      radial-gradient(85% 120% at 0% 0%, rgba(163, 42, 34, 0.11), rgba(163, 42, 34, 0.04) 38%, transparent 72%);
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, repeat, no-repeat;
+    background-size: 100% 100%, auto min(38vh, 300px), 380px 24px, 24px 24px, 24px 24px, auto, 100% min(26vh, 200px);
+    background-position: 0 0, center 46%,
+      center calc(46% + min(19vh, 150px) + 20px),
+      0 0, 0 0, 0 0, 0 0;
+  }
+  #win-dark .main {
+    background-image:
+      linear-gradient(to top, var(--dsw-alias-bg-base) 0 22%, transparent 36%),
+      url("assets/emblem-wm-dark.webp"),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='380' height='24'><text x='190' y='17' text-anchor='middle' font-family='Georgia,serif' font-size='13' letter-spacing='2.6' fill='rgba(232,224,212,0.42)'>MINOS BUREAU OF CRISIS CONTROL</text></svg>"),
+      linear-gradient(rgba(232, 224, 212, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232, 224, 212, 0.05) 1px, transparent 1px),
+      repeating-linear-gradient(0deg, rgba(232, 224, 212, 0.016) 0 1px, transparent 1px 4px),
+      radial-gradient(85% 120% at 0% 0%, rgba(224, 75, 58, 0.12), rgba(224, 75, 58, 0.045) 38%, transparent 72%);
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, repeat, no-repeat;
+    background-size: 100% 100%, auto min(38vh, 300px), 380px 24px, 24px 24px, 24px 24px, auto, 100% min(26vh, 200px);
+    background-position: 0 0, center 46%,
+      center calc(46% + min(19vh, 150px) + 20px),
+      0 0, 0 0, 0 0, 0 0;
+  }
+
+  /* 四角 HUD 角标 */
+  .win::after {
+    content: ''; position: absolute; inset: 8px; pointer-events: none; z-index: 4;
+    --hud-line: rgba(232, 224, 212, 0.18);
+    background:
+      linear-gradient(var(--hud-line), var(--hud-line)) left top / 16px 1px no-repeat,
+      linear-gradient(var(--hud-line), var(--hud-line)) left top / 1px 16px no-repeat,
+      linear-gradient(var(--hud-line), var(--hud-line)) right top / 16px 1px no-repeat,
+      linear-gradient(var(--hud-line), var(--hud-line)) right top / 1px 16px no-repeat,
+      linear-gradient(var(--hud-line), var(--hud-line)) left bottom / 16px 1px no-repeat,
+      linear-gradient(var(--hud-line), var(--hud-line)) left bottom / 1px 16px no-repeat,
+      linear-gradient(var(--hud-line), var(--hud-line)) right bottom / 16px 1px no-repeat,
+      linear-gradient(var(--hud-line), var(--hud-line)) right bottom / 1px 16px no-repeat;
+  }
+  #win-light::after { --hud-line: rgba(32, 24, 18, 0.16); }
+  .top {
+    height: 38px; flex: none; display: flex; align-items: center; gap: 10px;
+    padding: 0 14px; border-bottom: 1px solid var(--dsw-alias-border-l1);
+  }
+  .dot { width: 5px; height: 5px; background: var(--dsw-alias-state-success-primary); }
+  .top .t { font-size: 11.5px; color: var(--dsw-alias-label-secondary); }
+  .top .t b { color: var(--dsw-alias-label-primary); font-weight: 500; }
+  .top .r { margin-left: auto; font: 9.5px/1 "Consolas", monospace; letter-spacing: .12em; color: var(--dsw-alias-label-caption); }
+
+  .thread { flex: 1; padding: 14px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+  .msg-user {
+    align-self: flex-end; max-width: 78%;
+    background: var(--dsw-specific-bubble);
+    padding: 9px 11px; font-size: 12px; line-height: 1.6;
+  }
+  .msg-ai { font-size: 12px; line-height: 1.75; color: var(--dsw-alias-label-primary); }
+  .msg-ai p { margin: 0 0 8px; }
+  .msg-ai .meta {
+    font: 9px/1 "Consolas", monospace; letter-spacing: .14em;
+    color: var(--dsw-alias-label-caption); margin-bottom: 6px;
+  }
+  code.inline {
+    font-family: "Consolas", monospace; font-size: 11px; padding: 1px 5px;
+    background: var(--dsw-alias-markdown-inline-code); color: var(--dsw-alias-label-primary);
+  }
+  pre {
+    margin: 0; padding: 9px 11px; font-family: "Consolas", monospace; font-size: 10.5px;
+    line-height: 1.7; color: var(--dsw-alias-label-secondary);
+    background: var(--dsw-alias-markdown-code-block);
+    box-shadow: inset 2px 0 0 color-mix(in srgb, var(--dsw-alias-brand-primary) 45%, transparent);
+    overflow: hidden;
+  }
+  pre .b { color: var(--dsw-alias-label-primary); }
+  pre .r { color: var(--dsw-alias-state-error-primary); }
+  .banner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 24px; padding: 0 9px; font: 9px/1 "Consolas", monospace;
+    letter-spacing: .12em; color: var(--dsw-alias-label-caption);
+    background: var(--dsw-alias-markdown-code-block-banner);
+    border-bottom: 1px solid var(--dsw-alias-border-l1);
+  }
+  .code-wrap { border: 1px solid var(--dsw-alias-border-l1); }
+  .trigger {
+    display: flex; align-items: center; gap: 8px; margin-top: auto;
+    padding: 7px 10px; font-size: 10.5px; color: var(--dsw-alias-label-secondary);
+    background: var(--dsw-alias-turn-trigger-bg);
+    border: 1px solid var(--dsw-alias-border-l1);
+  }
+  .trigger i { width: 4px; height: 4px; background: var(--dsw-alias-brand-primary); }
+
+  /* 输入区 */
+  .composer {
+    position: relative; margin: 0 12px 12px; padding: 11px 12px 9px;
+    background: var(--dsw-specific-input-major);
+    border: 1px solid var(--dsw-alias-border-l2);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--dsw-alias-brand-primary) 38%, transparent);
+  }
+  .composer::before {
+    content: ''; position: absolute; top: 5px; left: 5px; width: 8px; height: 8px;
+    border-left: 1px solid color-mix(in srgb, var(--dsw-alias-brand-primary) 55%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--dsw-alias-brand-primary) 55%, transparent);
+  }
+  .composer .ph { font-size: 11.5px; color: var(--dsw-alias-label-caption); }
+  .composer .row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .chip {
+    font: 9px/1 "Consolas", monospace; letter-spacing: .1em;
+    color: var(--dsw-alias-label-secondary);
+    border: 1px solid var(--dsw-alias-border-l2); padding: 4px 6px;
+  }
+  .send {
+    margin-left: auto; padding: 6px 14px; font-size: 11px; letter-spacing: .1em;
+    background: var(--dsw-alias-button-primary-fill);
+    color: var(--dsw-alias-label-primary-inverted);
+    border: 0; cursor: default;
+  }
+
+  /* 浮层：菜单 + tooltip */
+  .menu {
+    position: absolute; right: 16px; top: 150px; width: 168px;
+    background: var(--dsw-menu-surface-fill);
+    border: 1px solid var(--dsw-alias-border-l2);
+    backdrop-filter: blur(10px) saturate(1.05);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+    z-index: 3;
+  }
+  .menu .grp {
+    padding: 6px 10px; font: 9px/1 "Consolas", monospace; letter-spacing: .16em;
+    color: var(--dsw-alias-label-caption);
+    background: var(--dsw-alias-menu-group-header-fill);
+  }
+  .menu .it {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 10px; font-size: 11px; color: var(--dsw-alias-label-primary);
+  }
+  .menu .it.hi { background: var(--dsw-alias-interactive-bg-hover); }
+  .menu .it span { font: 9px/1 "Consolas", monospace; color: var(--dsw-alias-label-caption); }
+  .tip {
+    position: absolute; left: 20px; bottom: 96px;
+    background: var(--dsw-alias-tooltip-bg); color: var(--dsw-alias-toast-label);
+    font-size: 10px; padding: 6px 9px; letter-spacing: .04em;
+    border: 1px solid var(--dsw-alias-border-l2);
+  }
+  .tip kbd {
+    font-family: "Consolas", monospace; font-size: 9px; padding: 1px 4px; margin-left: 4px;
+    background: var(--dsw-alias-tooltip-key-bg);
+  }
+
+  /* ---------- 浮层组件 ---------- */
+  .ov {
+    position: relative;
+    display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px;
+    padding: 34px 16px 16px;
+    background: var(--dsw-alias-bg-base);
+    border: 1px solid var(--dsw-alias-border-l2);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  }
+  .ov-tag {
+    position: absolute; top: 10px; left: 12px;
+    font: 9px/1 "Consolas", monospace; letter-spacing: .18em;
+    color: var(--dsw-alias-label-caption);
+  }
+  .ov .menu { position: static; right: auto; top: auto; width: 190px; box-shadow: 0 12px 30px rgba(0,0,0,.3); }
+  .ov .tip { position: static; left: auto; bottom: auto; }
+  .ov .toast {
+    background: var(--dsw-alias-toast-bg); color: var(--dsw-alias-toast-label);
+    font-size: 10.5px; letter-spacing: .04em; padding: 7px 10px;
+    border-left: 2px solid var(--dsw-alias-brand-primary);
+  }
+
+  /* ---------- token 条 ---------- */
+  .tokens { max-width: 620px; margin: 34px auto 0; }
+  .sw {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+    gap: 2px; background: #2a2a36; border: 1px solid #2a2a36;
+  }
+  .sw div { background: #07070b; padding-bottom: 6px; }
+  .sw i { display: block; height: 34px; margin-bottom: 6px; }
+  .sw b, .sw em {
+    display: block; padding: 0 7px; font-style: normal;
+    font-family: "Consolas", monospace; font-size: 8.5px; line-height: 1.5;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sw b { color: #a9bccb; }
+  .sw em { color: #6b7885; }
+  .note { font: 10px/1.9 "Consolas", monospace; color: #6b7885; margin-top: 18px; }
+  .note b { color: #a9bccb; font-weight: 500; }
+
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 99;
+    opacity: .035; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+  }
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="kicker">DSH Theme / MBCC Console / preview</div>
+    <h1>MBCC 控制台主题</h1>
+    <p class="sub">用真实 token 渲染的组件预览：<b>冷形式 × 热内容</b>。骨架无彩色，红色只做信号；零圆角、1px 描边、纸色主文字。</p>
+  </div>
+
+  <div class="stack">
+    <section>
+      <div class="cap"><b>01</b> DARK / 狄斯城终端 · 默认</div>
+      <div class="win" data-mode="dark" id="win-dark"></div>
+    </section>
+    <section>
+      <div class="cap"><b>02</b> LIGHT / 纸质档案</div>
+      <div class="win" data-mode="light" id="win-light"></div>
+    </section>
+    <section>
+      <div class="cap"><b>03</b> OVERLAYS / 菜单 · 提示 · Toast</div>
+      <div class="ov" data-mode="dark" id="ov-dark"><span class="ov-tag">DARK</span></div>
+      <div class="ov" data-mode="light" id="ov-light" style="margin-top:10px;"><span class="ov-tag">LIGHT</span></div>
+    </section>
+  </div>
+
+  <div class="tokens">
+    <div class="cap"><b>04</b> CORE TOKENS</div>
+    <div class="sw" id="sw"></div>
+    <p class="note">
+      预览由 <b>build-preview.js</b> 从 client.js 直接抽取 token 生成，颜色永远和实际主题一致。<br>
+      真实应用里由 ThemePresenter 把同一批值写成 body 内联样式。
+    </p>
+  </div>
+
+<div class="grain"></div>
+
+<script>
+const TOKENS = /*__TOKENS__*/{};
+
+const WIN = `
+  <div class="side">
+    <div class="brand"><div class="mark"><span>M</span></div><b>MBCC</b></div>
+    <div class="new-session"><span class="plus">+</span><span>MBCC事项</span></div>
+    <div class="nav active"><span>工作区</span><span class="k">W</span></div>
+    <div class="nav"><span>搜索</span><span class="k">K</span></div>
+    <div class="nav"><span>档案</span><span class="k">A</span></div>
+    <div class="side-sep">SESSIONS</div>
+    <div class="sess on">S-019 · 档案整理</div>
+    <div class="sess">辛迪加 · 线索归档</div>
+    <div class="sess">终端调试记录</div>
+    <div class="sess">狄斯城 · 值班日志</div>
+  </div>
+  <div class="main">
+    <div class="top">
+      <i class="dot"></i>
+      <span class="t"><b>mbcc-console</b> · DSH</span>
+      <span class="r">SIGNAL 92% · 04:32</span>
+    </div>
+    <div class="thread">
+      <div class="msg-user">把这三份审讯记录合并成一条时间线，标出矛盾的地方。</div>
+      <div class="msg-ai">
+        <div class="meta">ASSISTANT / 03 FILES / 14 NODES</div>
+        <p>已合并 <code class="inline">S-019</code> 的三份记录，共 14 个时间节点。第 7 与第 11 节点存在直接冲突：</p>
+        <div class="code-wrap">
+          <div class="banner"><span>TIMELINE.JSON</span><span>READ ONLY</span></div>
+          <pre>{
+  "node": 7,
+  "time": "02:14",
+  "claim": <span class="b">"目标仍在收容中"</span>,
+  "conflict": <span class="r">"node 11: 目标已脱离"</span>
+}</pre>
+        </div>
+        <div class="trigger"><i></i>继续整理第 8–14 节点</div>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="ph">向 MBCC 终端输入指令…</div>
+      <div class="row">
+        <span class="chip">⌘ K 指令</span>
+        <span class="chip">/ 档案</span>
+        <button class="send">发送</button>
+      </div>
+    </div>
+  </div>
+`;
+
+for (const mode of ['dark', 'light']) {
+  const el = document.getElementById('win-' + mode);
+  for (const [k, v] of Object.entries(TOKENS)) el.style.setProperty(k, v[mode]);
+  el.innerHTML = WIN;
+}
+
+const OV = `
+  <div class="menu">
+    <div class="grp">ACTIONS</div>
+    <div class="it hi"><span>新建会话</span><span>⌘N</span></div>
+    <div class="it"><span>打开档案</span><span>⌘O</span></div>
+    <div class="it"><span>切换外观</span><span>⌘⇧L</span></div>
+  </div>
+  <div class="tip">搜索会话<kbd>⌘K</kbd></div>
+  <div class="toast">档案已同步 / FILE SYNCED</div>
+`;
+for (const mode of ['dark', 'light']) {
+  const el = document.getElementById('ov-' + mode);
+  for (const [k, v] of Object.entries(TOKENS)) el.style.setProperty(k, v[mode]);
+  el.insertAdjacentHTML('beforeend', OV);
+}
+
+const SHOW = [
+  ['bg-base', '--dsw-alias-bg-base'],
+  ['layer-1', '--dsw-alias-bg-layer-1'],
+  ['sidebar', '--dsw-specific-sidebar-fill'],
+  ['border-l2', '--dsw-alias-border-l2'],
+  ['label-primary', '--dsw-alias-label-primary'],
+  ['label-secondary', '--dsw-alias-label-secondary'],
+  ['brand-primary', '--dsw-alias-brand-primary'],
+  ['business', '--dsw-alias-state-business-primary'],
+  ['link', '--dsw-alias-link'],
+  ['bubble', '--dsw-specific-bubble'],
+  ['error', '--dsw-alias-state-error-primary'],
+  ['success', '--dsw-alias-state-success-primary'],
+  ['warn', '--dsw-alias-state-warn-primary'],
+  ['inline-code', '--dsw-alias-markdown-inline-code'],
+];
+document.getElementById('sw').innerHTML = SHOW.map(([name, token]) => {
+  const v = TOKENS[token] || { dark: '#000', light: '#fff' };
+  const raw = String(v.dark);
+  const c = /^#[0-9a-f]{6,8}$/i.test(raw) ? raw : '#2a2a36';
+  return '<div><i style="background:' + c + '"></i><b>' + name + '</b><em>' + c.toUpperCase() + '</em></div>';
+}).join('');
+</script>
+</body>
+</html>

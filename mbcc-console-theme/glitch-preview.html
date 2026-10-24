@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8" /><style>
+html, body { margin: 0; height: 100%; }
+body {
+  background: #07070b; color: #e8e0d4; display: flex;
+  font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+.side { width: 300px; flex: none; border-right: 1px solid #1a1a22; padding: 20px 16px; box-sizing: border-box; }
+.side .brandcopy { font-family: Georgia, serif; font-size: 18px; letter-spacing: .08em; margin-bottom: 24px; }
+.side .row { height: 34px; display: flex; align-items: center; font-size: 13px; color: #a9bccb; border-top: 1px dotted #222; }
+main { flex: 1; }
+/* ============================================================
+   故障信号层：极低频（22–52s 一次）、极短（180ms）
+   只做 RGB 分离与整层位移，不改任何布局。
+   ============================================================ */
+#mbcc-signal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 280px;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2147483050;
+  overflow: hidden;
+  display: block;
+}
+#mbcc-signal .slice {
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  opacity: 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  animation: mbcc-slice 300ms steps(2, end) 1;
+  will-change: opacity, transform;
+}
+body[data-mbcc-console='on']:not([data-ds-dark-theme]) #mbcc-signal .slice {
+  background: rgba(0, 0, 0, 0.05);
+  border-top-color: rgba(0, 0, 0, 0.16);
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+@keyframes mbcc-slice {
+  0% { opacity: 0; transform: translate3d(0, 0, 0); }
+  18% { opacity: 1; transform: translate3d(var(--dx, 2px), 0, 0); }
+  52% { opacity: 0.85; transform: translate3d(calc(var(--dx, 2px) * -1), 0, 0); }
+  100% { opacity: 0; transform: translate3d(0, 0, 0); }
+}
+
+/* 余额数字刷新时的色散 */
+#mbcc-balance .b-amt.is-tick { animation: mbcc-amt-tick 620ms ease-in-out 1; }
+@keyframes mbcc-amt-tick {
+  0% { text-shadow: none; }
+  30% { text-shadow: 1px 0 rgba(255, 90, 78, 0.5), -1px 0 rgba(78, 205, 196, 0.4); }
+  65% { text-shadow: -1px 0 rgba(255, 90, 78, 0.5), 1px 0 rgba(78, 205, 196, 0.4); }
+  100% { text-shadow: none; }
+}
+
+/* 开屏收尾：一次 200ms 的切片错位 */
+#mbcc-boot.boot-glitch { animation: mbcc-boot-glitch 480ms cubic-bezier(0.4, 0, 0.2, 1) 1; }
+@keyframes mbcc-boot-glitch {
+  0% { clip-path: inset(0 0 0 0); transform: none; }
+  22% { clip-path: inset(14% 0 60% 0); transform: translateX(-3px); }
+  48% { clip-path: inset(0 0 0 0); transform: translateX(0); }
+  68% { clip-path: inset(62% 0 14% 0); transform: translateX(3px); }
+  100% { clip-path: inset(0 0 0 0); transform: none; }
+}
+
+
+
+/* 故障动效总开关：关掉后标题入场与金额色散都不动 */
+body[data-mbcc-fx='off'] [data-phase='hero'] [class*='_headline']::after,
+body[data-mbcc-fx='off'] #mbcc-balance .b-amt.is-tick {
+  animation: none !important;
+}
+body[data-mbcc-fx='off'] #mbcc-signal { display: none !important; }
+
+</style></head>
+<body data-mbcc-console="on" data-ds-dark-theme>
+  <div id="mbcc-signal" style="left:0;top:0;width:300px;height:100%">
+    <div class="slice" style="top:84px;height:12px;--dx:3px;animation-play-state:paused;animation-delay:-110ms"></div>
+    <div class="slice" style="top:168px;height:9px;--dx:-4px;animation-play-state:paused;animation-delay:-110ms"></div>
+    <div class="slice" style="top:262px;height:14px;--dx:2px;animation-play-state:paused;animation-delay:-110ms"></div>
+  </div>
+  <aside class="side">
+    <div class="brandcopy">MBCC AI TERMINAL</div>
+    <div class="row">插件</div>
+    <div class="row">插件市场</div>
+    <div class="row">自动化任务</div>
+    <div class="row">任务看板</div>
+    <div class="row">MCP 连接器</div>
+  </aside>
+  <main></main>
+</body></html>

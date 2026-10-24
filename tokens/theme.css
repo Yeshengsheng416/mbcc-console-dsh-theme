@@ -1,0 +1,791 @@
+/* ============================================================
+   无期迷途 · 风格复刻主题
+   Path to Nowhere — reproduction theme
+   与 design-tokens.json / 复刻指南 一一对应
+   ============================================================ */
+
+:root {
+  /* ---- 黑域 ---- */
+  --void: #050507;
+  --bg-0: #0a0a0f;
+  --bg-1: #12121a;
+  --bg-2: #1a1a24;
+  --line-1: #2a2a36;
+  --line-2: #3d3d4d;
+
+  /* ---- 红（主色） ---- */
+  --red-900: #4a0f12;
+  --red-700: #7a1a1a;
+  --red-500: #a32a22;
+  --red-400: #c4342a;
+  --red-300: #e04b3a;
+  --red-100: #ff6b57;
+
+  /* ---- 冷蓝灰（城市） ---- */
+  --blue-900: #141c26;
+  --blue-700: #1f2c3a;
+  --blue-500: #3a4f63;
+  --blue-300: #6e8296;
+  --blue-100: #a9bccb;
+
+  /* ---- 品红 / 紫（异能） ---- */
+  --magenta-700: #5b2a48;
+  --magenta-500: #a63a7a;
+  --violet-500: #5b3a6e;
+
+  /* ---- 金（权力） ---- */
+  --gold-700: #6e5326;
+  --gold-500: #a8832f;
+  --gold-300: #c9a227;
+  --gold-100: #e6c877;
+
+  /* ---- 纸 / 肤 ---- */
+  --paper: #e8e0d4;
+  --skin: #cfc5be;
+  --warm-grey: #948277;
+  --text-dim: #6e6a66;
+
+  /* ---- 语义 ---- */
+  --danger: #d0342c;
+  --warning: #c08c34;
+  --success: #4e7a5e;
+  --info: #5c7285;
+  --focus: #e04b3a;
+
+  /* ---- 字体 ---- */
+  --font-display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  --font-body: "Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-cond: "Barlow Condensed", "Oswald", "Arial Narrow", sans-serif;
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", "Consolas", monospace;
+
+  /* ---- 间距（4pt） ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+
+  /* ---- 动效 ---- */
+  --dur-instant: 90ms;
+  --dur-fast: 160ms;
+  --dur-base: 240ms;
+  --dur-slow: 360ms;
+  --dur-cinematic: 720ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-emph: cubic-bezier(0.16, 1, 0.3, 1);
+  --stagger: 40ms;
+}
+
+/* ============================================================
+   基础
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--void);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--red-700);
+  color: var(--paper);
+}
+
+a {
+  color: inherit;
+}
+
+/* ============================================================
+   全屏氛围层（颗粒 / 暗角 / 扫描线）
+   ============================================================ */
+
+.mcc-grain,
+.mcc-vignette,
+.mcc-scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 90;
+}
+
+/* 颗粒：SVG feTurbulence，缓存为 data-uri，overlay 混合 */
+.mcc-grain {
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+  animation: mcc-grain-shift 1.2s steps(4) infinite;
+}
+
+@keyframes mcc-grain-shift {
+  0% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(-2%, 1%, 0); }
+  50% { transform: translate3d(1%, -2%, 0); }
+  75% { transform: translate3d(-1%, 2%, 0); }
+  100% { transform: translate3d(2%, -1%, 0); }
+}
+
+/* 暗角：中心透明，四角死黑 */
+.mcc-vignette {
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    rgba(0, 0, 0, 0) 38%,
+    rgba(0, 0, 0, 0.45) 74%,
+    rgba(0, 0, 0, 0.92) 100%
+  );
+}
+
+/* 扫描线 */
+.mcc-scanlines {
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.035) 0 1px,
+    transparent 1px 4px
+  );
+  animation: mcc-scan-drift 9s linear infinite;
+}
+
+@keyframes mcc-scan-drift {
+  from { background-position-y: 0; }
+  to { background-position-y: 64px; }
+}
+
+/* ============================================================
+   排版
+   ============================================================ */
+
+.mcc-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(44px, 7vw, 76px);
+  line-height: 0.98;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.mcc-h1 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 48px;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.mcc-label {
+  font-family: var(--font-cond);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--blue-300);
+}
+
+.mcc-data {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--blue-300);
+}
+
+/* 竖排装饰标签 */
+.mcc-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  color: var(--text-dim);
+}
+
+/* ============================================================
+   按钮
+   ============================================================ */
+
+.mcc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 48px;
+  min-width: 132px;
+  padding: 0 22px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-instant) linear,
+    filter var(--dur-instant) linear;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mcc-btn:active {
+  transform: scale(0.98);
+  filter: brightness(1.08);
+}
+
+.mcc-btn:focus-visible {
+  outline: 1px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* 主按钮：填充红 + 双角 45° 切角 */
+.mcc-btn--primary {
+  background: var(--red-500);
+  color: var(--paper);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% 100%,
+    10px 100%,
+    0 calc(100% - 10px)
+  );
+}
+
+.mcc-btn--primary:hover {
+  background: var(--red-400);
+}
+
+/* 次按钮：1px 描边，悬停转红 */
+.mcc-btn--ghost {
+  border-color: var(--line-2);
+  color: var(--blue-100);
+}
+
+.mcc-btn--ghost:hover {
+  border-color: var(--red-500);
+  color: var(--paper);
+}
+
+/* 危险按钮 */
+.mcc-btn--danger {
+  background: var(--red-900);
+  border-color: var(--red-500);
+  color: var(--red-100);
+}
+
+.mcc-btn--danger:hover {
+  background: #5c1216;
+}
+
+/* 幽灵文字按钮 */
+.mcc-btn--text {
+  min-width: 0;
+  padding: 0 8px;
+  color: var(--text-dim);
+}
+
+.mcc-btn--text:hover {
+  color: var(--paper);
+}
+
+/* ============================================================
+   标签页
+   ============================================================ */
+
+.mcc-tabs {
+  display: flex;
+  gap: var(--space-6);
+  border-bottom: 1px solid var(--line-1);
+}
+
+.mcc-tab {
+  position: relative;
+  padding: 10px 0 12px;
+  border: 0;
+  background: none;
+  color: var(--text-dim);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.mcc-tab[aria-selected="true"] {
+  color: var(--paper);
+}
+
+.mcc-tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--red-500);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.mcc-tab[aria-selected="true"]::after {
+  transform: scaleX(1);
+}
+
+/* ============================================================
+   面板 / 弹窗
+   ============================================================ */
+
+.mcc-panel {
+  position: relative;
+  background: rgba(18, 18, 26, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: var(--space-5);
+}
+
+.mcc-panel--accent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20px;
+  bottom: 20px;
+  width: 3px;
+  background: var(--red-500);
+}
+
+.mcc-modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: rgba(3, 3, 5, 0.72);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  animation: mcc-fade-in var(--dur-base) var(--ease-out) forwards;
+}
+
+.mcc-modal {
+  width: min(360px, 88vw);
+  background: rgba(12, 12, 18, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 22px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: mcc-rise-in var(--dur-base) var(--ease-out) 60ms forwards;
+}
+
+.mcc-modal__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 10px;
+  margin-bottom: var(--space-4);
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  border-left: 3px solid var(--red-500);
+  color: var(--paper);
+}
+
+.mcc-modal__body {
+  color: var(--blue-100);
+  font-size: 14px;
+  line-height: 1.7;
+  margin-bottom: var(--space-5);
+}
+
+.mcc-modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@keyframes mcc-fade-in {
+  to { opacity: 1; }
+}
+
+@keyframes mcc-rise-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mcc-rise-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ============================================================
+   卡片 / 档案卡
+   ============================================================ */
+
+.mcc-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border: 1px solid var(--line-1);
+  background: var(--bg-1);
+  overflow: hidden;
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    filter var(--dur-fast) var(--ease-out);
+}
+
+.mcc-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(163, 42, 34, 0.55);
+  filter: brightness(1.06);
+}
+
+.mcc-card__img {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 80% at 70% 10%, rgba(224, 75, 58, 0.28), transparent 60%),
+    radial-gradient(90% 70% at 20% 90%, rgba(91, 42, 72, 0.35), transparent 65%),
+    linear-gradient(160deg, #1c1a26 0%, #0b0b12 60%, #050507 100%);
+}
+
+.mcc-card__shade {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 45%;
+  background: linear-gradient(to top, rgba(5, 5, 7, 0.95), transparent);
+}
+
+.mcc-card__meta {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.mcc-card__name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.mcc-card__no {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  writing-mode: vertical-rl;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+}
+
+/* 选中态：四角 L 形角标 */
+.mcc-card::before,
+.mcc-card::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+  pointer-events: none;
+}
+
+.mcc-card::before {
+  top: 6px;
+  left: 6px;
+  border-top: 1px solid var(--paper);
+  border-left: 1px solid var(--paper);
+}
+
+.mcc-card::after {
+  right: 6px;
+  bottom: 6px;
+  border-right: 1px solid var(--paper);
+  border-bottom: 1px solid var(--paper);
+}
+
+.mcc-card.is-active::before,
+.mcc-card.is-active::after {
+  opacity: 1;
+}
+
+.mcc-card.is-active {
+  border-color: var(--red-500);
+}
+
+/* 菱形稀有度角标 */
+.mcc-diamond {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--gold-300);
+  transform: rotate(45deg);
+  display: grid;
+  place-items: center;
+}
+
+.mcc-diamond > span {
+  transform: rotate(-45deg);
+  font-family: var(--font-cond);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--gold-100);
+}
+
+/* ============================================================
+   侧边菜单卡（大厅右侧）
+   ============================================================ */
+
+.mcc-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 148px;
+}
+
+.mcc-menu__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 12px 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(10, 10, 15, 0.68);
+  backdrop-filter: blur(6px);
+  color: var(--skin);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.mcc-menu__item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--red-500);
+  transform: scaleY(0.35);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.mcc-menu__item:hover,
+.mcc-menu__item.is-active {
+  border-color: rgba(163, 42, 34, 0.6);
+  background: rgba(74, 15, 18, 0.45);
+  transform: translateX(-4px);
+  color: var(--paper);
+}
+
+.mcc-menu__item:hover::before,
+.mcc-menu__item.is-active::before {
+  transform: scaleY(1);
+}
+
+.mcc-menu__no {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+
+/* ============================================================
+   表单 / 进度 / 提示
+   ============================================================ */
+
+.mcc-field {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line-2);
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.mcc-field:focus-within {
+  border-color: var(--red-500);
+}
+
+.mcc-field input {
+  flex: 1;
+  border: 0;
+  background: none;
+  color: var(--paper);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  outline: none;
+}
+
+.mcc-field input::placeholder {
+  color: var(--text-dim);
+}
+
+.mcc-bar {
+  position: relative;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.mcc-bar__fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--red-500), var(--red-300));
+  transition: width 600ms var(--ease-out);
+}
+
+.mcc-bar__cap {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 8px;
+  background: var(--paper);
+  transform: translateY(-2px);
+}
+
+.mcc-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 18%;
+  z-index: 300;
+  transform: translate(-50%, 8px);
+  padding: 10px 16px 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 2px solid var(--red-500);
+  background: rgba(12, 12, 18, 0.94);
+  color: var(--paper);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.mcc-toast.is-on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ============================================================
+   动效演示
+   ============================================================ */
+
+.mcc-glitch {
+  animation: mcc-glitch 180ms steps(3) 1;
+}
+
+@keyframes mcc-glitch {
+  0% { clip-path: inset(0 0 0 0); transform: translate3d(0, 0, 0); }
+  20% { clip-path: inset(12% 0 66% 0); transform: translate3d(-6px, 0, 0); }
+  40% { clip-path: inset(52% 0 24% 0); transform: translate3d(5px, 0, 0); }
+  60% { clip-path: inset(30% 0 52% 0); transform: translate3d(-3px, 0, 0); }
+  80% { clip-path: inset(70% 0 8% 0); transform: translate3d(2px, 0, 0); }
+  100% { clip-path: inset(0 0 0 0); transform: translate3d(0, 0, 0); }
+}
+
+/* 扫描转场：1px 线自上而下 */
+.mcc-scan-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  pointer-events: none;
+  background: rgba(3, 3, 5, 0.92);
+  clip-path: inset(0 0 100% 0);
+}
+
+.mcc-scan-wipe.is-run {
+  animation: mcc-wipe var(--dur-cinematic) var(--ease-emph) forwards;
+}
+
+@keyframes mcc-wipe {
+  0% { clip-path: inset(0 0 100% 0); }
+  45% { clip-path: inset(0 0 0 0); }
+  55% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(100% 0 0 0); }
+}
+
+/* 呼吸光 */
+.mcc-breathe {
+  animation: mcc-breathe 3.6s var(--ease-inout) infinite alternate;
+}
+
+@keyframes mcc-breathe {
+  from { opacity: 0.35; }
+  to { opacity: 0.65; }
+}
+
+/* 环状旋转 */
+.mcc-spin {
+  animation: mcc-spin 24s linear infinite;
+}
+
+@keyframes mcc-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 悬浮淡入（供演示） */
+.mcc-enter {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: mcc-enter var(--dur-base) var(--ease-out) forwards;
+}
+
+@keyframes mcc-enter {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   可访问性
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .mcc-grain,
+  .mcc-scanlines,
+  .mcc-spin,
+  .mcc-breathe {
+    animation: none !important;
+  }
+}

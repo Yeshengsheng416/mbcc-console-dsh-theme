@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8" /><style>
+html, body { margin: 0; height: 100%; }
+body { background: #07070b; font-family: "Segoe UI", sans-serif; }
+/* ============================================================
+   主题设置：点击左上角徽标呼出
+   ============================================================ */
+#mbcc-theme-menu {
+  position: fixed;
+  z-index: 2147483200;
+  width: 236px;
+  box-sizing: border-box;
+  padding: 10px 12px 8px;
+  background: rgba(6, 6, 10, 0.97);
+  border: 1px solid rgba(232, 224, 212, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  color: #e8e0d4;
+  font-family: "Consolas", "JetBrains Mono", monospace;
+  display: none;
+}
+#mbcc-theme-menu.is-open { display: block; }
+#mbcc-theme-menu .m-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 8px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #6e8296;
+}
+#mbcc-theme-menu .m-ver { color: #3d3d4d; letter-spacing: 0.08em; }
+#mbcc-theme-menu .m-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px dotted rgba(232, 224, 212, 0.1);
+  background: none;
+  color: #e8e0d4;
+  font: 11px/1.4 "Segoe UI", "Microsoft YaHei", sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+#mbcc-theme-menu .m-row:last-child { border-bottom: 0; }
+#mbcc-theme-menu .m-row:hover { color: #fff; }
+#mbcc-theme-menu .m-switch {
+  position: relative;
+  width: 30px;
+  height: 15px;
+  flex: none;
+  border: 1px solid rgba(232, 224, 212, 0.3);
+  border-radius: 999px;
+}
+#mbcc-theme-menu .m-switch::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #6e8296;
+  transition: transform 160ms ease, background 160ms ease;
+}
+#mbcc-theme-menu .m-switch[aria-pressed='true'] { border-color: rgba(224, 75, 58, 0.7); }
+#mbcc-theme-menu .m-switch[aria-pressed='true']::after {
+  transform: translateX(15px);
+  background: #e04b3a;
+}
+#mbcc-theme-menu .m-seg {
+  display: inline-flex;
+  border: 1px solid rgba(232, 224, 212, 0.2);
+}
+#mbcc-theme-menu .m-seg button {
+  padding: 4px 7px;
+  border: 0;
+  border-right: 1px solid rgba(232, 224, 212, 0.12);
+  background: none;
+  color: #7f93a6;
+  font: 10px/1 "Consolas", monospace;
+  cursor: pointer;
+}
+#mbcc-theme-menu .m-seg button:last-child { border-right: 0; }
+#mbcc-theme-menu .m-seg button.is-on { background: rgba(163, 42, 34, 0.45); color: #e8e0d4; }
+#mbcc-theme-menu .m-arrow { color: #6e8296; }
+
+/* 设置生效 */
+body[data-mbcc-grid='off'] [class*='_centerCol'] [data-phase='active'] {
+  background-image: none !important;
+}
+body[data-mbcc-pill='off'] #mbcc-balance { display: none !important; }
+
+/* 切换主题/强调色时的柔光过渡层 */
+#mbcc-fade {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483150;
+  pointer-events: none;
+  opacity: 0;
+  background: #07070b;
+  transition: opacity 200ms ease;
+}
+#mbcc-fade.is-on { opacity: 1; }
+
+/* 强调色色板 */
+#mbcc-theme-menu .m-swatches { display: inline-flex; gap: 6px; }
+#mbcc-theme-menu .m-swatch {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid rgba(232, 224, 212, 0.25);
+  background: var(--c, #A32A22);
+  cursor: pointer;
+}
+#mbcc-theme-menu .m-swatch.is-on {
+  border-color: #e8e0d4;
+  box-shadow: 0 0 0 2px rgba(232, 224, 212, 0.18);
+}
+
+/* 余额预警：滑块 + 数字输入 */
+#mbcc-theme-menu .m-col { cursor: default; }
+#mbcc-theme-menu .m-num {
+  width: 46px;
+  height: 22px;
+  box-sizing: border-box;
+  border: 1px solid rgba(232, 224, 212, 0.22);
+  background: transparent;
+  color: #e8e0d4;
+  font: 11px/1 "Consolas", monospace;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+#mbcc-theme-menu .m-num::-webkit-outer-spin-button,
+#mbcc-theme-menu .m-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+#mbcc-theme-menu .m-num:focus { outline: none; border-color: rgba(224, 75, 58, 0.6); }
+#mbcc-theme-menu .m-slide { padding: 2px 0 10px; }
+#mbcc-theme-menu .m-range {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin: 7px 0 2px;
+  background: linear-gradient(
+    90deg,
+    #a32a22 0 var(--fill, 5%),
+    rgba(232, 224, 212, 0.18) var(--fill, 5%) 100%
+  );
+  outline: none;
+}
+#mbcc-theme-menu .m-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 9px;
+  height: 9px;
+  background: #e8e0d4;
+  border: 1px solid #a32a22;
+  transform: rotate(45deg);
+  cursor: pointer;
+}
+#mbcc-theme-menu .m-range::-moz-range-thumb {
+  width: 9px;
+  height: 9px;
+  background: #e8e0d4;
+  border: 1px solid #a32a22;
+  cursor: pointer;
+}
+
+#mbcc-theme-menu { display: block; left: 90px; top: 80px; }
+</style></head>
+<body data-mbcc-console="on">
+  <div id="mbcc-theme-menu" class="is-open">
+    <div class="m-head"><span>MBCC THEME</span><span class="m-ver">v0.24</span></div>
+    <button class="m-row" data-toggle="boot"><span>开屏动画</span><i class="m-switch" aria-pressed="true"></i></button>
+    <button class="m-row" data-toggle="grid"><span>对话区底纹</span><i class="m-switch" aria-pressed="true"></i></button>
+    <button class="m-row" data-toggle="pill"><span>余额胶囊</span><i class="m-switch" aria-pressed="false"></i></button>
+    <button class="m-row" data-toggle="fx"><span>故障动效</span><i class="m-switch" aria-pressed="true"></i></button>
+    <button class="m-row" data-toggle="roundFont"><span>圆体界面</span><i class="m-switch" aria-pressed="false"></i></button>
+    <div class="m-row m-col"><span>强调色</span><span class="m-swatches">
+      <button class="m-swatch is-on" data-accent="red" style="--c:#A32A22"></button>
+      <button class="m-swatch" data-accent="cyan" style="--c:#2FB6C6"></button>
+      <button class="m-swatch" data-accent="blue" style="--c:#5B8DEF"></button>
+      <button class="m-swatch" data-accent="orange" style="--c:#E08A3A"></button>
+      <button class="m-swatch" data-accent="white" style="--c:#E8E0D4"></button>
+    </span></div>
+    <div class="m-row m-col"><span>外观</span><span class="m-seg">
+      <button data-theme-mode="dark" class="is-on">暗色</button><button data-theme-mode="light">亮色</button>
+    </span></div>
+    <div class="m-row m-col"><span>低余额预警</span>
+      <input class="m-num" type="number" value="5" /></div>
+    <div class="m-slide"><input class="m-range" type="range" min="1" max="100" value="5" style="--fill:4%" /></div>
+    <button class="m-row" data-act="replay"><span>重播开屏</span><span class="m-arrow">→</span></button>
+  </div>
+</body></html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8" /><style>
+html, body { margin: 0; height: 100%; }
+body {
+  background: #07070b; color: #e8e0d4; font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+  --dsw-alias-brand-primary: #A32A22;
+  --dsw-alias-label-primary: #e8e0d4;
+  display: flex; flex-direction: column;
+}
+.layout { display: flex; flex: 1; }
+.side { width: 260px; padding: 18px 14px; box-sizing: border-box; border-right: 1px solid #1a1a22; }
+.brand { opacity: .55; font-family: Georgia, serif; font-size: 15px; letter-spacing: .05em; margin-bottom: 26px; }
+.session { position: relative; height: 34px; display: flex; align-items: center; padding-left: 12px; font-size: 13px; border-top: 1px solid #24242e; }
+.session.on { background: linear-gradient(90deg, color-mix(in srgb, var(--dsw-alias-brand-primary) 34%, transparent), color-mix(in srgb, var(--dsw-alias-brand-primary) 10%, transparent)); }
+.main { flex: 1; padding: 20px 24px; display: flex; flex-direction: column; }
+.row { position: relative; padding: 10px 0 10px 12px; font-size: 13px; color: #c9d3dc; border-bottom: 1px dotted #222; }
+.composer { margin-top: auto; height: 64px; border: 1px solid #24242e; display: flex; align-items: center; padding: 0 14px; color: #6b747e; font-size: 13px; }
+/* ============================================================
+   发送/入场动效
+   ============================================================ */
+#mbcc-sweep {
+  position: fixed;
+  height: 1px;
+  pointer-events: none;
+  z-index: 2147483140;
+  opacity: 0;
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--dsw-alias-brand-primary), transparent 85%);
+}
+#mbcc-sweep.is-on { animation: mbcc-sweep 280ms cubic-bezier(0.22, 1, 0.36, 1) 1; }
+@keyframes mbcc-sweep {
+  0% { opacity: 0; transform: scaleX(0); }
+  18% { opacity: 1; }
+  72% { opacity: 0.75; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+
+/* 新消息：轻微上浮 + 左侧红规自上而下画出 */
+body[data-mbcc-console='on'] [data-chat-flow-key].mbcc-enter {
+  animation: mbcc-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+  position: relative;
+}
+body[data-mbcc-console='on'] [data-chat-flow-key].mbcc-enter::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--dsw-alias-brand-primary);
+  transform-origin: top center;
+  animation: mbcc-rule-grow 280ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+@keyframes mbcc-enter {
+  from { opacity: 0.55; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes mbcc-rule-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+/* 会话选中：2px 红规生长（替换原来的 inset 阴影） */
+body[data-mbcc-console='on'] [data-row-key^='session:'][aria-selected='true']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--dsw-alias-brand-primary);
+  transform-origin: top center;
+  animation: mbcc-rule-grow 220ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+
+/* 窗口失焦：待机 */
+#mbcc-idle {
+  position: fixed;
+  left: 14px;
+  bottom: 12px;
+  z-index: 2147483040;
+  display: none;
+  font: 9px/1 "Consolas", "JetBrains Mono", monospace;
+  letter-spacing: 0.22em;
+  color: #5f6b76;
+  pointer-events: none;
+  user-select: none;
+}
+#mbcc-idle::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 7px;
+  background: #5f6b76;
+  animation: mbcc-idle-blink 2.6s steps(1, end) infinite;
+}
+@keyframes mbcc-idle-blink {
+  0%, 55% { opacity: 1; }
+  56%, 100% { opacity: 0.25; }
+}
+body[data-mbcc-idle='on'] #mbcc-idle { display: block; }
+body[data-mbcc-idle='on'] [class*='_sidebarCol'] button[class*='_brand'] { opacity: 0.55; }
+body[data-mbcc-idle='on'] [class*='_sidebarCol'] button[class*='_brand']::after { color: #6b747e; }
+
+/* 彩蛋：乱码行的轻微噪点 */
+#mbcc-boot .boot-garble {
+  opacity: 0.92;
+  text-shadow: 0 0 6px rgba(224, 75, 58, 0.25);
+}
+
+/* 切换主题/强调色时的柔光过渡层 */
+#mbcc-fade {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483150;
+  pointer-events: none;
+  opacity: 0;
+  background: #07070b;
+  transition: opacity 200ms ease;
+}
+#mbcc-fade.is-on { opacity: 1; }
+
+/* 强调色色板 */
+#mbcc-theme-menu .m-swatches { display: inline-flex; gap: 6px; }
+#mbcc-theme-menu .m-swatch {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid rgba(232, 224, 212, 0.25);
+  background: var(--c, #A32A22);
+  cursor: pointer;
+}
+#mbcc-theme-menu .m-swatch.is-on {
+  border-color: #e8e0d4;
+  box-shadow: 0 0 0 2px rgba(232, 224, 212, 0.18);
+}
+
+/* 余额预警：滑块 + 数字输入 */
+#mbcc-theme-menu .m-col { cursor: default; }
+#mbcc-theme-menu .m-num {
+  width: 46px;
+  height: 22px;
+  box-sizing: border-box;
+  border: 1px solid rgba(232, 224, 212, 0.22);
+  background: transparent;
+  color: #e8e0d4;
+  font: 11px/1 "Consolas", monospace;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+#mbcc-theme-menu .m-num::-webkit-outer-spin-button,
+#mbcc-theme-menu .m-num::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+#mbcc-theme-menu .m-num:focus { outline: none; border-color: rgba(224, 75, 58, 0.6); }
+#mbcc-theme-menu .m-slide { padding: 2px 0 10px; }
+#mbcc-theme-menu .m-range {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 2px;
+  margin: 7px 0 2px;
+  background: linear-gradient(
+    90deg,
+    #a32a22 0 var(--fill, 5%),
+    rgba(232, 224, 212, 0.18) var(--fill, 5%) 100%
+  );
+  outline: none;
+}
+#mbcc-theme-menu .m-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 9px;
+  height: 9px;
+  background: #e8e0d4;
+  border: 1px solid #a32a22;
+  transform: rotate(45deg);
+  cursor: pointer;
+}
+#mbcc-theme-menu .m-range::-moz-range-thumb {
+  width: 9px;
+  height: 9px;
+  background: #e8e0d4;
+  border: 1px solid #a32a22;
+  cursor: pointer;
+}
+
+/* 预览：冻结在中间帧 */
+.session.on::before { animation-play-state: paused !important; animation-delay: -90ms !important; }
+.row.mbcc-enter { animation-play-state: paused !important; animation-delay: -100ms !important; }
+.row.mbcc-enter::before { animation-play-state: paused !important; animation-delay: -100ms !important; }
+#mbcc-sweep { animation-play-state: paused !important; animation-delay: -90ms !important; opacity: 1 !important; transform: scaleX(0.62) !important; }
+</style></head>
+<body data-mbcc-console="on" data-ds-dark-theme data-mbcc-idle="on">
+  <div class="layout">
+    <aside class="side">
+      <div class="brand">MBCC AI TERMINAL</div>
+      <div class="session on" data-row-key="session:a" aria-selected="true">无期迷途美术风格复刻研究</div>
+      <div class="session">DSH 主题编写研究</div>
+    </aside>
+    <main class="main">
+      <div class="row">上一条消息</div>
+      <div class="row mbcc-enter" data-chat-flow-key="turn:1">新消息：已合并 S-019 的三份记录。</div>
+      <div class="composer">发消息或创建任务…</div>
+    </main>
+  </div>
+  <div id="mbcc-sweep" class="is-on" style="left:300px;top:404px;width:520px"></div>
+  <div id="mbcc-idle">PAUSED</div>
+</body></html>

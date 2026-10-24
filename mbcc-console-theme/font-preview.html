@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>MBCC Font — preview</title>
+<style>
+  @font-face {
+    font-family: 'MBCC Round';
+    src: url("assets/fonts/zihun-round.ttf") format('truetype');
+    font-display: swap;
+  }
+  html, body { margin: 0; background: #07070b; color: #e8e0d4; font-family: "Segoe UI", "Microsoft YaHei", sans-serif; }
+  .wrap { display: flex; gap: 0; padding: 24px; }
+  .col { flex: 1; padding: 20px 24px; border: 1px solid #1c1c26; }
+  .col + .col { border-left: 0; }
+  .tag { font: 9px/1 Consolas, monospace; letter-spacing: .2em; color: #6e8296; margin-bottom: 14px; }
+  .sample { font-size: 14px; line-height: 1.9; color: #e8e0d4; }
+  .sample .dim { color: #7f93a6; }
+  .title { font-size: 26px; margin: 0 0 10px; }
+  .round .sample { font-family: 'MBCC Round', "Segoe UI", "Microsoft YaHei", sans-serif; }
+  .round .title { font-family: "Segoe UI", "Microsoft YaHei", sans-serif; }
+  .mono { font-family: Consolas, monospace; font-size: 12px; color: #a9bccb; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="col">
+      <div class="tag">DEFAULT / 系统字体</div>
+      <h2 class="title">无期迷途 · 美术风格</h2>
+      <div class="sample">
+        局长，欢迎回来。狄斯城今夜有雨，监控矩阵已同步 128 名禁闭者。<br />
+        <span class="dim">S-019 / 档案整理 · 最后更新 00:39</span><br />
+        <span class="mono">BALANCE ¥21.92 · 214 tok/s</span>
+      </div>
+    </div>
+    <div class="col round">
+      <div class="tag">ROUND / 字魂创中圆</div>
+      <h2 class="title">无期迷途 · 美术风格</h2>
+      <div class="sample">
+        局长，欢迎回来。狄斯城今夜有雨，监控矩阵已同步 128 名禁闭者。<br />
+        <span class="dim">S-019 / 档案整理 · 最后更新 00:39</span><br />
+        <span class="mono">BALANCE ¥21.92 · 214 tok/s</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

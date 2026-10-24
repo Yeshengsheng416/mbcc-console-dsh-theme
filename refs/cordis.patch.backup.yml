@@ -1,0 +1,76 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+- id: agent-default-model
+  name: "@deepseek-ai/dsh-agent-default-model"
+  config:
+    provider: deepseek-account
+    model: deepseek-flash
+    reasoningEffort: high
+- id: ui-settings-account
+  name: "@deepseek-ai/dsh-client-ui-settings-account"
+  config:
+    version: 1
+    step: done
+    purpose: both
+    process: standard
+    completion: completed
+    usage: detailed
+    developerTools: true
+- id: ui-chat
+  name: "@deepseek-ai/dsh-client-ui-chat"
+  config:
+    transcriptView: standard
+    performanceUsage: detailed
+- id: ui-settings
+  name: "@deepseek-ai/dsh-client-ui-settings"
+  config:
+    enabled: true
+- id: ui-theme
+  name: "@deepseek-ai/dsh-client-ui-theme"
+  config:
+    fontSize: 15
+- id: dsh-endfield-theme
+  disabled: true
+- id: theme-endfield
+  name: dsh-theme-endfield
+  config:
+    palette: valley
+    glass: standard
+    radius: square
+    contour: "1"
+    contourFps: "60"
+    loader: "1"
+    balanceCapsule: "1"
+    audioEnabled: "1"
+    audioVolume: "60"
+- id: web
+  name: "@deepseek-ai/dsh-web"
+  config:
+    searchProvider: ddg
+    fetchProvider: fs-quality-fetch
+- id: dsh-ops-file
+  name: dsh-ops/file
+  config:
+    promptPolicy: true
+    required: false
+    configUpdateVersion: 2
+- id: agency-agents
+  name: "@michengai/dsh-agency-agents"
+  config:
+    customExperts: []
+    enabled:
+      - engineering-ai-engineer
+- id: dsh-ops-shell
+  name: dsh-ops/shell
+  config:
+    promptPolicy: true
+    publishBashTool: true
+    shellPolicy: advise
+    allowSystemShellFallback: false
+    configUpdateVersion: 2
+- id: theme-endfield
+  disabled: true
+- insert:
+    - id: mbcc-console
+      name: 'dsh-theme-mbcc-console'

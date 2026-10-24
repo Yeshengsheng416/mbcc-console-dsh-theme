@@ -1,0 +1,175 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "meta": {
+    "name": "Path to Nowhere — reproduction tokens",
+    "version": "1.0.0",
+    "basis": "public key visuals & in-game screenshots, quantized approximation",
+    "usage": {
+      "black": "68-72%",
+      "coolGreyPaper": "16-20%",
+      "red": "6-8%",
+      "goldMagenta": "2-3%",
+      "pureWhite": "<=1%"
+    }
+  },
+  "color": {
+    "void": { "$value": "#050507", "$type": "color" },
+    "bg-0": { "$value": "#0A0A0F", "$type": "color" },
+    "bg-1": { "$value": "#12121A", "$type": "color" },
+    "bg-2": { "$value": "#1A1A24", "$type": "color" },
+    "line-1": { "$value": "#2A2A36", "$type": "color" },
+    "line-2": { "$value": "#3D3D4D", "$type": "color" },
+    "red-900": { "$value": "#4A0F12", "$type": "color" },
+    "red-700": { "$value": "#7A1A1A", "$type": "color" },
+    "red-500": { "$value": "#A32A22", "$type": "color" },
+    "red-400": { "$value": "#C4342A", "$type": "color" },
+    "red-300": { "$value": "#E04B3A", "$type": "color" },
+    "red-100": { "$value": "#FF6B57", "$type": "color" },
+    "blue-900": { "$value": "#141C26", "$type": "color" },
+    "blue-700": { "$value": "#1F2C3A", "$type": "color" },
+    "blue-500": { "$value": "#3A4F63", "$type": "color" },
+    "blue-300": { "$value": "#6E8296", "$type": "color" },
+    "blue-100": { "$value": "#A9BCCB", "$type": "color" },
+    "magenta-700": { "$value": "#5B2A48", "$type": "color" },
+    "magenta-500": { "$value": "#A63A7A", "$type": "color" },
+    "violet-500": { "$value": "#5B3A6E", "$type": "color" },
+    "gold-700": { "$value": "#6E5326", "$type": "color" },
+    "gold-500": { "$value": "#A8832F", "$type": "color" },
+    "gold-300": { "$value": "#C9A227", "$type": "color" },
+    "gold-100": { "$value": "#E6C877", "$type": "color" },
+    "paper": { "$value": "#E8E0D4", "$type": "color" },
+    "skin": { "$value": "#CFC5BE", "$type": "color" },
+    "warm-grey": { "$value": "#948277", "$type": "color" },
+    "text-dim": { "$value": "#6E6A66", "$type": "color" },
+    "danger": { "$value": "#D0342C", "$type": "color" },
+    "warning": { "$value": "#C08C34", "$type": "color" },
+    "success": { "$value": "#4E7A5E", "$type": "color" },
+    "info": { "$value": "#5C7285", "$type": "color" },
+    "focus": { "$value": "#E04B3A", "$type": "color" }
+  },
+  "opacity": {
+    "grain": { "$value": 0.06, "$type": "number" },
+    "scanline": { "$value": 0.035, "$type": "number" },
+    "vignette-edge": { "$value": 0.92, "$type": "number" },
+    "mask": { "$value": 0.72, "$type": "number" },
+    "panel": { "$value": 0.92, "$type": "number" }
+  },
+  "typography": {
+    "family": {
+      "display": { "$value": "\"Noto Serif SC\", \"Source Han Serif SC\", \"Songti SC\", \"SimSun\", serif" },
+      "body": { "$value": "\"Noto Sans SC\", \"Source Han Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif" },
+      "condensed": { "$value": "\"Barlow Condensed\", \"Oswald\", \"Arial Narrow\", sans-serif" },
+      "mono": { "$value": "\"JetBrains Mono\", \"IBM Plex Mono\", \"Consolas\", monospace" }
+    },
+    "size": {
+      "display": { "$value": "72sp" },
+      "h1": { "$value": "48sp" },
+      "h2": { "$value": "32sp" },
+      "h3": { "$value": "24sp" },
+      "body-l": { "$value": "20sp" },
+      "body": { "$value": "16sp" },
+      "caption": { "$value": "14sp" },
+      "label": { "$value": "12sp" },
+      "micro": { "$value": "10sp", "note": "decorative only, never body copy" }
+    },
+    "tracking": {
+      "display": { "$value": "0.02em" },
+      "body": { "$value": "0.01em" },
+      "label": { "$value": "0.14em" }
+    },
+    "lineHeight": {
+      "display": { "$value": 0.98 },
+      "heading": { "$value": 1.1 },
+      "body": { "$value": 1.6 }
+    }
+  },
+  "space": {
+    "1": { "$value": "4px" },
+    "2": { "$value": "8px" },
+    "3": { "$value": "12px" },
+    "4": { "$value": "16px" },
+    "5": { "$value": "24px" },
+    "6": { "$value": "32px" },
+    "8": { "$value": "48px" }
+  },
+  "size": {
+    "touch-min": { "$value": "44px" },
+    "button-height": { "$value": "48px" },
+    "top-bar": { "$value": "44px" },
+    "bottom-bar": { "$value": "56px" },
+    "menu-card": { "$value": "148x52" },
+    "card-ratio": { "$value": "3:4" },
+    "modal-width": { "$value": "min(360px, 88vw)" },
+    "icon": { "$value": "24px" },
+    "stroke": { "$value": "1px" },
+    "chamfer": { "$value": "10px" },
+    "radius": { "$value": "0-2px" }
+  },
+  "motion": {
+    "duration": {
+      "instant": { "$value": "90ms" },
+      "fast": { "$value": "160ms" },
+      "base": { "$value": "240ms" },
+      "slow": { "$value": "360ms" },
+      "cinematic": { "$value": "720ms" }
+    },
+    "easing": {
+      "out": { "$value": "cubic-bezier(0.22, 1, 0.36, 1)" },
+      "in": { "$value": "cubic-bezier(0.4, 0, 1, 1)" },
+      "inout": { "$value": "cubic-bezier(0.65, 0, 0.35, 1)" },
+      "emphatic": { "$value": "cubic-bezier(0.16, 1, 0.3, 1)" }
+    },
+    "stagger": { "$value": "40ms", "max-items": 6 },
+    "press": { "scale": 0.98, "brightness": 1.08, "duration": "90ms" },
+    "hover": { "translateY": "-2px", "duration": "160ms" },
+    "pageTransition": {
+      "total": "720ms",
+      "sequence": ["mask-in 180ms", "scan-line 360ms", "layout", "mask-out 180ms"]
+    },
+    "ambient": {
+      "breathe": "3.6s ease-in-out alternate",
+      "fog-drift": "8s / 12s",
+      "rain-speed": "600-900px/s",
+      "scanline-drift": "9s linear"
+    }
+  },
+  "graphic": {
+    "angles": [0, 45, 90],
+    "frameGap": "8-16px",
+    "decorationMaxArea": "5%",
+    "grain": "4-8%",
+    "chromaticAberration": "0.5-2px",
+    "bloom": { "threshold": 0.75, "radius": "12-32px" }
+  },
+  "scene": {
+    "lightRatio": "1:8",
+    "fogOpacity": "0.2-0.4",
+    "vignette": "25-40%",
+    "layers": {
+      "foreground": { "luma": "0-12%", "parallax": 1.0, "blur": "0" },
+      "midground": { "luma": "40-65%", "parallax": 0.4, "blur": "0" },
+      "background": { "luma": "15-30%", "parallax": 0.15, "blur": "2-6px" }
+    },
+    "recipes": {
+      "disCity": { "temp": "6500K + magenta neon", "keys": ["blue-900", "magenta-500", "red-500"] },
+      "syndicate": { "temp": "2700K + dirty green", "keys": ["#2A2118", "#4A5A3A", "#C08C34"] },
+      "mbccCorridor": { "temp": "5000K cold white", "keys": ["#1A1E24", "blue-100", "paper"] },
+      "interrogation": { "temp": "single hard top light", "keys": ["void", "paper", "red-700"] },
+      "clinic": { "temp": "cold green-white", "keys": ["#E8F0EC", "#4E7A5E", "red-500"] },
+      "underground": { "temp": "amber + red alarm", "keys": ["#3A2A18", "red-700", "gold-500"] },
+      "blackRing": { "temp": "self-luminous", "keys": ["void", "red-100", "magenta-500"] },
+      "baroqueHall": { "temp": "warm gold + deep red", "keys": ["gold-500", "red-900", "paper"] },
+      "rooftop": { "temp": "cool night", "keys": ["blue-900", "blue-300", "paper"] },
+      "dream": { "temp": "directionless soft", "keys": ["violet-500", "blue-100", "void"] }
+    }
+  },
+  "zIndex": {
+    "scene": 0,
+    "hud": 10,
+    "overlay": 20,
+    "modal": 200,
+    "toast": 300,
+    "transition": 400,
+    "ambient": 90
+  }
+}

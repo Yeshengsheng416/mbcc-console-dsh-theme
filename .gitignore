@@ -1,0 +1,14 @@
+# 工作过程文件，不进仓库
+backup/
+tools/out/
+tools/patch_v*.py
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+
+# 桌面端 profile 的本地补丁（如误复制进来）
+cordis.patch.local.yml
+
+# 外部参考资料，不随仓库分发
+dsh-theme-guide/

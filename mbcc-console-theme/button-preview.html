@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8" /><style>
+html, body { margin: 0; height: 100%; }
+body {
+  background: #050508; color: #e8e0d4; padding: 140px 24px 40px;
+  font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+  --dsw-alias-label-primary: #e8e0d4;
+  --dsw-alias-label-secondary: #a9bccb;
+  --dsw-alias-brand-primary: #a32a22;
+  --dsw-alias-button-elevated-fill: #101016;
+}
+.col { width: 260px; }
+/* ============================================================
+   新会话按钮：警戒线暗纹 + 左侧红规 + 文案替换
+   class 后缀 _newSession / _newSessionLabel 是 CSS Modules 的稳定名字，
+   前缀哈希会随构建变，所以用 [class*=] 命中名字而不是哈希。
+   ============================================================ */
+body[data-mbcc-console='on'] button[class*='_newSession'] {
+  position: relative;
+  border: 1px solid rgba(232, 224, 212, 0.1) !important;
+  border-radius: 0 !important;
+  color: var(--dsw-alias-label-primary);
+  background-color: var(--dsw-alias-button-elevated-fill);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 58%),
+    repeating-linear-gradient(
+      -45deg,
+      color-mix(in srgb, var(--dsw-alias-brand-primary) 12%, transparent) 0 6px,
+      transparent 6px 18px
+    ) !important;
+  background-size: 100% 100%, 240% 240%;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, repeat;
+  box-shadow:
+    inset 2px 0 0 color-mix(in srgb, var(--dsw-alias-brand-primary) 72%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  transition:
+    border-color 240ms ease,
+    box-shadow 240ms ease,
+    background-position 620ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 120ms ease;
+}
+body[data-mbcc-console='on'] button[class*='_newSession']:hover {
+  border-color: rgba(224, 75, 58, 0.45) !important;
+  background-position: 0 0, 22px 22px;
+  box-shadow:
+    inset 2px 0 0 #e04b3a,
+    inset 0 0 26px rgba(163, 42, 34, 0.2),
+    0 0 0 1px rgba(224, 75, 58, 0.14);
+}
+body[data-mbcc-console='on'] button[class*='_newSession']:active {
+  transform: scale(0.995);
+}
+/* 新会话图标：隐藏应用自带的 ⊕，换成切角方框 + 加号 */
+body[data-mbcc-console='on'] button[class*='_newSession'] svg {
+  display: none !important;
+}
+body[data-mbcc-console='on'] [class*='_newSessionContent']::before {
+  content: '';
+  flex: none;
+  width: 17px;
+  height: 17px;
+  background: currentColor;
+  opacity: 1;
+  -webkit-mask:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M2 6V2h4M14 10v4h-4' fill='none' stroke='black' stroke-width='1.5'/><path d='M8 5.4v5.2M5.4 8h5.2' fill='none' stroke='black' stroke-width='1.5'/></svg>")
+    center / contain no-repeat;
+  mask:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M2 6V2h4M14 10v4h-4' fill='none' stroke='black' stroke-width='1.5'/><path d='M8 5.4v5.2M5.4 8h5.2' fill='none' stroke='black' stroke-width='1.5'/></svg>")
+    center / contain no-repeat;
+}
+
+body[data-mbcc-console='on'] button[class*='_newSession']::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  bottom: -30%;
+  left: -45%;
+  width: 34%;
+  pointer-events: none;
+  opacity: 0;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+}
+body[data-mbcc-console='on'] button[class*='_newSession']:hover::after {
+  animation: mbcc-sheen 720ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+@keyframes mbcc-sheen {
+  0% { left: -45%; opacity: 0; }
+  18% { opacity: 1; }
+  100% { left: 115%; opacity: 0; }
+}
+body[data-mbcc-console='on'] button[class*='_newSession']:hover [class*='_newSessionLabel']::after {
+  text-shadow: 0 0 12px rgba(224, 75, 58, 0.4);
+}
+@media (prefers-reduced-motion: reduce) {
+  body[data-mbcc-console='on'] button[class*='_newSession'],
+  body[data-mbcc-console='on'] button[class*='_newSession']:hover { transition: none; }
+  body[data-mbcc-console='on'] button[class*='_newSession']:hover::after { animation: none; }
+}
+
+/* 收起成 36px 轨道时不要花纹，否则是一块噪点。
+   属性可能挂在 html 或 sidebar 根上，两种祖先都覆盖。 */
+body[data-mbcc-console='on'] [data-sidebar-collapsed='true'] button[class*='_newSession'],
+html[data-sidebar-collapsed='true'] body[data-mbcc-console='on'] button[class*='_newSession'] {
+  background-image: none !important;
+  box-shadow: none;
+}
+
+/* 文案：隐藏原文，用伪元素换成 MBCC事项（React 重渲染也不会还原） */
+body[data-mbcc-console='on'] [class*='_newSessionLabel'] {
+  font-size: 0 !important;
+}
+/* 文字盒改成 inline-flex 居中：避免 font-size:0 的零高 strut 把文字往下压 */
+body[data-mbcc-console='on'] [class*='_newSessionLabel']:not([class*='Mask']) {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  line-height: 1;
+}
+body[data-mbcc-console='on'] [class*='_newSessionLabel']:not([class*='Mask'])::after {
+  content: 'MBCC事项';
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--dsw-alias-label-primary);
+  white-space: nowrap;
+}
+
+button { font: inherit; }
+.Hqq-bq_newSession { width: 100%; height: 38px; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; container-type: inline-size; }
+.Hqq-bq_newSessionLabelMask { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.Hqq-bq_newSessionContent { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100cqw; }
+.Hqq-bq_newSessionLabel { white-space: nowrap; }
+</style></head>
+<body data-mbcc-console="on" data-ds-dark-theme>
+  <div class="col">
+    <button class="Hqq-bq_newSession" id="b1">
+      <span class="Hqq-bq_newSessionLabelMask">
+        <span class="Hqq-bq_newSessionContent">
+          <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1"/></svg>
+          <span class="Hqq-bq_newSessionLabel Hqq-bq_wide">新会话</span>
+        </span>
+      </span>
+    </button>
+  </div>
+</body></html>
