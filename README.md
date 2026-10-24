@@ -68,4 +68,10 @@ powershell -ExecutionPolicy Bypass -File .\mbcc-console-theme\install.ps1
 
 ## 支持作者给大肥鱼买大米
 
+如果这个主题帮到了你，可以给大肥鱼买点大米。**完全自愿，不影响任何功能**；扫码前请自行确认收款方。
+
+| 支付宝 | 微信赞赏 |
+| :---: | :---: |
+| <img src="refs/reward/alipay.png" width="260" alt="支付宝" /> | <img src="refs/reward/wechat.png" width="260" alt="微信赞赏" /> |
+
 
