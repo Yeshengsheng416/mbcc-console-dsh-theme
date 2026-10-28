@@ -1,0 +1,437 @@
+diff --git a/README.md b/README.md
+index 3f984f0..221ea0e 100644
+--- a/README.md
++++ b/README.md
+@@ -25,6 +25,8 @@
+ 
+ ## 安装
+ 
++Windows（PowerShell）：
++
+ ```powershell
+ # 1) 复制主题包到 DSH profile
+ powershell -ExecutionPolicy Bypass -File .\mbcc-console-theme\install.ps1
+@@ -32,8 +34,18 @@ powershell -ExecutionPolicy Bypass -File .\mbcc-console-theme\install.ps1
+ # 2) 重启 DSH Desktop
+ ```
+ 
+-脚本会把包放到 `%USERPROFILE%\.dsh\profiles\desktop\node_modules\dsh-theme-mbcc-console`，
+-并在 `cordis.patch.yml` 里追加注册项。卸载用 `uninstall.ps1`。
++macOS / Linux：
++
++```sh
++# 1) 复制主题包到 DSH profile
++sh ./mbcc-console-theme/install.sh
++
++# 2) 重启 DSH Desktop
++```
++
++脚本会把包放到 profile 的 `node_modules/dsh-theme-mbcc-console`
++（Windows：`%USERPROFILE%\.dsh\profiles\desktop`；macOS：`~/.dsh/profiles/desktop`），
++并在 `cordis.patch.yml` 里追加注册项。卸载用 `uninstall.ps1` / `uninstall.sh`。
+ 
+ 完整用法、排错与手动安装步骤见 **[使用说明.md](使用说明.md)**。
+ 
+diff --git a/mbcc-console-theme/client.js b/mbcc-console-theme/client.js
+index baf1751..f4599fa 100644
+--- a/mbcc-console-theme/client.js
++++ b/mbcc-console-theme/client.js
+@@ -668,10 +668,10 @@ body[data-mbcc-console='on'] [class*='_sidebarCol'] [class*='_logoRow'] {
+   padding-right: 0 !important;
+   justify-content: center !important;
+ }
+-body[data-mbcc-console='on'] [class*='_sidebarCol'] button[class*='_brand'] > * {
++body[data-mbcc-console='on'] [class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand'] > * {
+   display: none !important;
+ }
+-body[data-mbcc-console='on'] [class*='_sidebarCol'] button[class*='_brand'] {
++body[data-mbcc-console='on'] [class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand'] {
+   display: grid;
+   grid-auto-flow: column;
+   width: 100%;
+@@ -682,18 +682,22 @@ body[data-mbcc-console='on'] [class*='_sidebarCol'] button[class*='_brand'] {
+   box-sizing: border-box;
+   /* 光学补偿：右边文字比左边徽标"重"，整体左移 3px 让视觉重心回到中线 */
+   padding-right: 6px;
++  /* macOS 下品牌是 span，而 logoRow 是窗口拖拽区：不排除拖拽会吞掉点击，
++     导致点徽标打不开主题设置面板。 */
++  -webkit-app-region: no-drag;
++  cursor: pointer;
+ }
+-body[data-mbcc-console='on'] [class*='_sidebarCol'] button[class*='_brand']::before {
++body[data-mbcc-console='on'] [class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand']::before {
+   content: '';
+   flex: none;
+   width: 30px;
+   height: 30px;
+   background: url("${EMBLEM_BOOT}") center / contain no-repeat;
+ }
+-body[data-mbcc-console='on']:not([data-ds-dark-theme]) [class*='_sidebarCol'] button[class*='_brand']::before {
++body[data-mbcc-console='on']:not([data-ds-dark-theme]) [class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand']::before {
+   background-image: url("${EMBLEM_INK}");
+ }
+-body[data-mbcc-console='on'] [class*='_sidebarCol'] button[class*='_brand']::after {
++body[data-mbcc-console='on'] [class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand']::after {
+   content: 'MBCC AI TERMINAL';
+   font-family: Georgia, "Times New Roman", serif;
+   font-size: 15px;
+@@ -703,8 +707,8 @@ body[data-mbcc-console='on'] [class*='_sidebarCol'] button[class*='_brand']::aft
+   white-space: nowrap;
+ }
+ /* 收起成轨道时只留徽标 */
+-body[data-mbcc-console='on'] [data-sidebar-collapsed='true'] [class*='_sidebarCol'] button[class*='_brand']::after,
+-html[data-sidebar-collapsed='true'] body[data-mbcc-console='on'] [class*='_sidebarCol'] button[class*='_brand']::after {
++body[data-mbcc-console='on'] [data-sidebar-collapsed='true'] [class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand']::after,
++html[data-sidebar-collapsed='true'] body[data-mbcc-console='on'] [class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand']::after {
+   display: none;
+ }
+ 
+@@ -975,7 +979,8 @@ body[data-mbcc-console='on'] [data-phase='hero'] [class*='_headline']::after {
+ body[data-mbcc-grid='off'] [class*='_centerCol'] [data-phase='active'] {
+   background-image: none !important;
+ }
+-body[data-mbcc-pill='off'] #mbcc-balance { display: none !important; }
++/* 胶囊挂在 <html> 下（与 <body> 是兄弟节点），只能用兄弟选择器 */
++body[data-mbcc-pill='off'] ~ #mbcc-balance { display: none !important; }
+ 
+ /* ============================================================
+    发送/入场动效
+@@ -1062,8 +1067,8 @@ body[data-mbcc-console='on'] [data-row-key^='session:'][aria-selected='true']::b
+   56%, 100% { opacity: 0.25; }
+ }
+ body[data-mbcc-idle='on'] #mbcc-idle { display: block; }
+-body[data-mbcc-idle='on'] [class*='_sidebarCol'] button[class*='_brand'] { opacity: 0.55; }
+-body[data-mbcc-idle='on'] [class*='_sidebarCol'] button[class*='_brand']::after { color: #6b747e; }
++body[data-mbcc-idle='on'] [class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand'] { opacity: 0.55; }
++body[data-mbcc-idle='on'] [class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand']::after { color: #6b747e; }
+ 
+ /* 彩蛋：乱码行的轻微噪点 */
+ #mbcc-boot .boot-garble {
+@@ -1205,10 +1210,10 @@ body[data-mbcc-console='on']:not([data-ds-dark-theme]) #mbcc-signal .slice {
+ 
+ /* 故障动效总开关：关掉后标题入场与金额色散都不动 */
+ body[data-mbcc-fx='off'] [data-phase='hero'] [class*='_headline']::after,
+-body[data-mbcc-fx='off'] #mbcc-balance .b-amt.is-tick {
++body[data-mbcc-fx='off'] ~ #mbcc-balance .b-amt.is-tick {
+   animation: none !important;
+ }
+-body[data-mbcc-fx='off'] #mbcc-signal { display: none !important; }
++body[data-mbcc-fx='off'] ~ #mbcc-signal { display: none !important; }
+ 
+ /* ============================================================
+    开屏：MBCC 终端自检日志
+@@ -1901,9 +1906,9 @@ body[data-mbcc-fx='off'] #mbcc-signal { display: none !important; }
+           '<div class="m-row m-col"><span>外观</span><span class="m-seg">' +
+           '<button data-theme-mode="dark">暗色</button><button data-theme-mode="light">亮色</button>' +
+           '</span></div>' +
+-          '<div class="m-row m-col"><span>低余额预警</span>' +
+-          '<input class="m-num" type="number" min="1" max="100" step="1" aria-label="低余额预警阈值" /></div>' +
+-          '<div class="m-slide"><input class="m-range" type="range" min="1" max="100" step="1" aria-label="低余额预警阈值" /></div>' +
++          '<div class="m-row m-col"><span>低余额预警（0 = 关）</span>' +
++          '<input class="m-num" type="number" min="0" max="100" step="1" aria-label="低余额预警阈值" /></div>' +
++          '<div class="m-slide"><input class="m-range" type="range" min="0" max="100" step="1" aria-label="低余额预警阈值" /></div>' +
+           '<button class="m-row" data-act="replay"><span>重播开屏</span><span class="m-arrow">→</span></button>';
+         document.documentElement.appendChild(panel);
+         const verEl = panel.querySelector('.m-ver');
+@@ -1917,10 +1922,11 @@ body[data-mbcc-fx='off'] #mbcc-signal { display: none !important; }
+           });
+           const range = panel.querySelector('.m-range');
+           const num = panel.querySelector('.m-num');
+-          const value = Math.min(100, Math.max(1, Number(settings.threshold) || 5));
++          const rawValue = Number(settings.threshold);
++          const value = Math.min(100, Math.max(0, isFinite(rawValue) ? rawValue : 5));
+           if (range) {
+             range.value = String(value);
+-            range.style.setProperty('--fill', ((value - 1) / 99) * 100 + '%');
++            range.style.setProperty('--fill', value + '%');
+           }
+           if (num) num.value = String(value);
+           panel.querySelectorAll('[data-accent]').forEach((b) => {
+@@ -1950,7 +1956,7 @@ body[data-mbcc-fx='off'] #mbcc-signal { display: none !important; }
+ 
+         const findBrand = () => {
+           try {
+-            return document.querySelector("[class*='_sidebarCol'] button[class*='_brand']");
++            return document.querySelector("[class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand']");
+           } catch (e) {
+             return null;
+           }
+@@ -2009,7 +2015,8 @@ body[data-mbcc-fx='off'] #mbcc-signal { display: none !important; }
+         });
+ 
+         const applyThreshold = (raw) => {
+-          const value = Math.min(100, Math.max(1, Math.round(Number(raw) || 5)));
++          const parsed = Number(raw);
++          const value = Math.min(100, Math.max(0, Math.round(isFinite(parsed) ? parsed : 5)));
+           settings.threshold = value;
+           saveSettings(settings);
+           sync();
+@@ -2041,7 +2048,7 @@ body[data-mbcc-fx='off'] #mbcc-signal { display: none !important; }
+ 
+         const brandOf = (node) => {
+           try {
+-            return node && node.closest ? node.closest("[class*='_sidebarCol'] button[class*='_brand']") : null;
++            return node && node.closest ? node.closest("[class*='_sidebarCol'] [class*='_logoRow'] > [class*='_brand']") : null;
+           } catch (e) {
+             return null;
+           }
+@@ -2180,11 +2187,14 @@ body[data-mbcc-fx='off'] #mbcc-signal { display: none !important; }
+             const value = res.value;
+             const wallets = value && value.status === 'ready' ? value.value : null;
+             if (!Array.isArray(wallets) || wallets.length === 0) throw new Error('no wallet');
+-            const w = wallets[0];
+-            const bonus = (value.bonusWallets || []).reduce(
+-              (sum, b) => sum + (Number(b.balance) || 0),
+-              0,
+-            );
++            const w = wallets.reduce((best, cur) => {
++              const a = Number(best && best.balance);
++              const b = Number(cur && cur.balance);
++              return (isFinite(b) ? b : -Infinity) > (isFinite(a) ? a : -Infinity) ? cur : best;
++            }, wallets[0]);
++            const bonus = (value.bonusWallets || [])
++              .filter((b) => b.currency === w.currency)
++              .reduce((sum, b) => sum + (Number(b.balance) || 0), 0);
+             const text = money(w);
+             if (amt.textContent !== text) {
+               amt.textContent = text;
+@@ -2197,8 +2207,9 @@ body[data-mbcc-fx='off'] #mbcc-signal { display: none !important; }
+             curEl.textContent = w.currency || '—';
+             timeEl.textContent = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+             el.classList.remove('is-error');
+-            const threshold = Number((window.__mbccSettings || {}).threshold) || 5;
+-            el.classList.toggle('is-low', Number(w.balance) < threshold);
++            const rawThreshold = Number((window.__mbccSettings || {}).threshold);
++            const threshold = isFinite(rawThreshold) ? rawThreshold : 5;
++            el.classList.toggle('is-low', threshold > 0 && Number(w.balance) < threshold);
+           } catch (e) {
+             fail();
+           }
+diff --git a/mbcc-console-theme/install.sh b/mbcc-console-theme/install.sh
+new file mode 100755
+index 0000000..3b80f73
+--- /dev/null
++++ b/mbcc-console-theme/install.sh
+@@ -0,0 +1,60 @@
++#!/bin/sh
++# Install dsh-theme-mbcc-console into a DSH Desktop profile (macOS / Linux).
++# Usage:
++#   sh ./install.sh
++#   sh ./install.sh /path/to/profile
++set -eu
++
++PROFILE_DIR="${1:-$HOME/.dsh/profiles/desktop}"
++SOURCE_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
++DEST="$PROFILE_DIR/node_modules/dsh-theme-mbcc-console"
++PATCH="$PROFILE_DIR/cordis.patch.yml"
++
++if [ ! -d "$PROFILE_DIR" ]; then
++  printf 'DSH profile not found: %s\n' "$PROFILE_DIR" >&2
++  printf 'Start DSH Desktop once, then re-run this script.\n' >&2
++  exit 1
++fi
++
++# 1) copy the package
++mkdir -p "$PROFILE_DIR/node_modules"
++rm -rf "$DEST"
++cp -R "$SOURCE_DIR" "$DEST"
++printf 'package  -> %s\n' "$DEST"
++
++# 2) add the patch row once
++if [ -f "$PATCH" ] && grep -q 'dsh-theme-mbcc-console' "$PATCH"; then
++  printf 'patch    -> entry already present\n'
++else
++  [ -f "$PATCH" ] || : > "$PATCH"
++  # A freshly initialised profile ships the placeholder `[]`; appending a list
++  # item after it is invalid YAML, so drop the placeholder first.
++  effective=$(grep -v '^[[:space:]]*#' "$PATCH" 2>/dev/null | tr -d '[:space:]' || true)
++  if [ "$effective" = "[]" ]; then
++    tmp="$PATCH.tmp.$$"
++    sed '/^[[:space:]]*\[\][[:space:]]*$/d' "$PATCH" > "$tmp"
++    mv "$tmp" "$PATCH"
++  fi
++  if [ -s "$PATCH" ]; then
++    last=$(tail -c 1 "$PATCH" | od -An -t x1 | tr -d ' \n')
++    [ "$last" = "0a" ] || printf '\n' >> "$PATCH"
++  fi
++  cat >> "$PATCH" <<'YAML'
++- insert:
++    - id: mbcc-console
++      name: 'dsh-theme-mbcc-console'
++YAML
++  printf 'patch    -> entry added\n'
++fi
++
++# 3) warn about other themes (two themes are not additive: later layer wins per token)
++theme_rows=$(grep -Ec 'theme-endfield|dsh-theme-' "$PATCH" 2>/dev/null || true)
++if [ "${theme_rows:-0}" -gt 1 ]; then
++  printf '\nWarning: another theme row exists in this profile.\n' >&2
++  printf 'Two themes override the same tokens; the later layer wins per token\n' >&2
++  printf 'and the other theme still injects its own CSS. Disable the other theme first:\n' >&2
++  printf "  - id: theme-endfield\n    disabled: true\n" >&2
++fi
++
++printf '\nDone. Restart DSH Desktop to apply.\n'
++printf 'Click the MBCC emblem at the top-left of the sidebar to open the theme panel.\n'
+diff --git a/mbcc-console-theme/uninstall.sh b/mbcc-console-theme/uninstall.sh
+new file mode 100755
+index 0000000..2b41264
+--- /dev/null
++++ b/mbcc-console-theme/uninstall.sh
+@@ -0,0 +1,47 @@
++#!/bin/sh
++# Remove dsh-theme-mbcc-console from a DSH Desktop profile (macOS / Linux).
++# Usage:
++#   sh ./uninstall.sh
++#   sh ./uninstall.sh /path/to/profile
++set -eu
++
++PROFILE_DIR="${1:-$HOME/.dsh/profiles/desktop}"
++DEST="$PROFILE_DIR/node_modules/dsh-theme-mbcc-console"
++PATCH="$PROFILE_DIR/cordis.patch.yml"
++
++if [ -d "$DEST" ]; then
++  rm -rf "$DEST"
++  printf 'removed  -> %s\n' "$DEST"
++else
++  printf 'package  -> not installed\n'
++fi
++
++if [ -f "$PATCH" ]; then
++  tmp="$PATCH.tmp.$$"
++  awk '
++    { line[NR] = $0 }
++    END {
++      for (i = 1; i <= NR; i++) {
++        if (line[i] == "- insert:" &&
++            line[i + 1] == "    - id: mbcc-console" &&
++            line[i + 2] ~ /^      name: .dsh-theme-mbcc-console.$/) { i += 2; continue }
++        print line[i]
++      }
++    }
++  ' "$PATCH" > "$tmp"
++  mv "$tmp" "$PATCH"
++  # Leave an explicit empty array instead of a comments-only file (parses as null).
++  if ! grep -qEv '^[[:space:]]*(#|$)' "$PATCH"; then
++    [ -s "$PATCH" ] || : > "$PATCH"
++    if [ -s "$PATCH" ]; then
++      last=$(tail -c 1 "$PATCH" | od -An -t x1 | tr -d ' \n')
++      [ "$last" = "0a" ] || printf '\n' >> "$PATCH"
++    fi
++    printf '[]\n' >> "$PATCH"
++  fi
++  printf 'patch    -> entry removed (if present)\n'
++else
++  printf 'patch    -> %s not found\n' "$PATCH"
++fi
++
++printf '\nDone. Restart DSH Desktop to restore the default appearance.\n'
+diff --git "a/\344\275\277\347\224\250\350\257\264\346\230\216.md" "b/\344\275\277\347\224\250\350\257\264\346\230\216.md"
+index f873fea..a031f02 100644
+--- "a/\344\275\277\347\224\250\350\257\264\346\230\216.md"
++++ "b/\344\275\277\347\224\250\350\257\264\346\230\216.md"
+@@ -5,7 +5,7 @@
+ 
+ - 主题包：`mbcc-console-theme/`（v0.48）
+ - 设计依据：`无期迷途美术风格复刻指南.md`
+-- 适用：DSH Desktop（Windows），Electron 渲染层
++- 适用：DSH Desktop（Windows / macOS），Electron 渲染层
+ 
+ ![深色主界面](refs/theme_preview_dark.png)
+ 
+@@ -99,10 +99,10 @@
+ 
+ ### 前置
+ 
+-- Windows 上的 DSH Desktop；
+-- 已至少启动过一次 DSH（确保 `%USERPROFILE%\.dsh\profiles\desktop` 存在）。
++- Windows 或 macOS 上的 DSH Desktop；
++- 已至少启动过一次 DSH（Windows 为 `%USERPROFILE%\.dsh\profiles\desktop`，macOS 为 `~/.dsh/profiles/desktop`）。
+ 
+-### 方式 A：脚本安装（推荐）
++### 方式 A：Windows 脚本安装（推荐）
+ 
+ 把 `mbcc-console-theme` 文件夹放到任意位置，在 PowerShell 里执行：
+ 
+@@ -121,11 +121,27 @@ powershell -ExecutionPolicy Bypass -File .\mbcc-console-theme\install.ps1
+ powershell -ExecutionPolicy Bypass -File .\install.ps1 -ProfileDir "D:\other\profile"
+ ```
+ 
+-### 方式 B：手动安装
++### 方式 B：macOS / Linux 脚本安装
+ 
+-1. 复制 `mbcc-console-theme` 到
+-   `C:\Users\<你>\.dsh\profiles\desktop\node_modules\dsh-theme-mbcc-console`；
+-2. 打开 `C:\Users\<你>\.dsh\profiles\desktop\cordis.patch.yml`，在末尾追加：
++在终端里执行（脚本是 POSIX sh，macOS 自带）：
++
++```sh
++sh ./mbcc-console-theme/install.sh
++```
++
++做的事情与 `install.ps1` 相同：把包复制到 `~/.dsh/profiles/desktop/node_modules/dsh-theme-mbcc-console`，
++并在 `cordis.patch.yml` 末尾追加注册行（已有则跳过）。指定其它 profile：
++
++```sh
++sh ./mbcc-console-theme/install.sh /path/to/profile
++```
++
++### 方式 C：手动安装
++
++1. 复制 `mbcc-console-theme` 到 profile 的 `node_modules` 下：
++   - Windows：`C:\Users\<你>\.dsh\profiles\desktop\node_modules\dsh-theme-mbcc-console`
++   - macOS：`~/.dsh/profiles/desktop/node_modules/dsh-theme-mbcc-console`
++2. 打开同一 profile 下的 `cordis.patch.yml`（macOS 为 `~/.dsh/profiles/desktop/cordis.patch.yml`），在末尾追加：
+ 
+    ```yaml
+    - insert:
+@@ -152,9 +168,13 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1 -ProfileDir "D:\other\pro
+ powershell -ExecutionPolicy Bypass -File .\mbcc-console-theme\uninstall.ps1
+ ```
+ 
++```sh
++sh ./mbcc-console-theme/uninstall.sh
++```
++
+ 会删除 profile 里的包并移除 patch 行（重启后恢复默认外观）。
+ 
+-**更新**：用新版本覆盖 `mbcc-console-theme` 后重新运行 `install.ps1`，再重启。
++**更新**：用新版本覆盖 `mbcc-console-theme` 后重新运行 `install.ps1`（macOS 为 `install.sh`），再重启。
+ 
+ ---
+ 
+@@ -167,7 +187,10 @@ powershell -ExecutionPolicy Bypass -File .\mbcc-console-theme\uninstall.ps1
+    仅限本机个人使用；对外分发前请先取得授权，或删掉字体、只保留 `local()` 回退；
+ 5. 浅色主题下部分红色描边会略深，这是按对比度算过的结果；
+ 6. **音效需要一次点击**：浏览器/Electron 的自动播放策略会拦掉首次发声，交互一次后正常；
+-7. **「结束」是启发式判定**：靠 2.6 秒静默推断，长时间思考停顿可能提前触发。
++7. **「结束」是启发式判定**：靠 2.6 秒静默推断，长时间思考停顿可能提前触发；
++8. **macOS 窗口圆角**：最外圈圆角由 macOS 原生窗口绘制（Windows 是 DWM），CSS 改不到；应用内面板仍是直角；
++9. **macOS 没有 Windows 标题栏**：标题栏下沿那条红发丝线只在 Windows 生效，macOS 由原生窗口 chrome 分隔，属预期差异；
++10. **macOS 侧栏顶部**：红绿灯与折叠按钮占用侧栏顶部 52px（DSH 的 `topStrip`），主题从那一行下面开始，不遮挡窗口按钮。
+ 
+ ---
+ 
+@@ -179,7 +202,8 @@ mbcc-console-theme/
+ ├─ client.js             # 浏览器侧：token + CSS + 开屏 + 胶囊 + 设置 + 动效 + 音效
+ ├─ package.json          # 0.50.0
+ ├─ cordis.patch.yml      # 注册片段
+-├─ install.ps1 / uninstall.ps1
++├─ install.ps1 / uninstall.ps1  # Windows 安装脚本
++├─ install.sh / uninstall.sh    # macOS / Linux 安装脚本
+ ├─ verify.js             # 契约 / 幂等 / 卸载检查
+ ├─ audit-contrast.js     # 34 组 WCAG 对比度检查
+ ├─ assets/               # 徽标、水印、字体、音效（sfx/）
+@@ -206,6 +230,12 @@ mbcc-console-theme/
+ 
+ ## 七、更新内容
+ 
++### macOS 适配
++
++- 侧栏品牌与主题设置面板入口兼容 macOS：DSH 在 darwin 下把品牌从 `<button>` 换成 `<span>`，旧选择器会整段失效；
++- 新增 `install.sh` / `uninstall.sh`（POSIX sh），安装与卸载路径自动落到 `~/.dsh`；
++- 文档补充 macOS 路径，以及窗口圆角、标题栏、红绿灯占位的差异说明。
++
+ ### v0.50（当前）
+ 
+ - 新增**界面音效**：设置面板多一行开关，默认关闭；
